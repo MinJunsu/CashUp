@@ -1,5 +1,5 @@
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'CashUp.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'cashup_backend.settings'
 os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = "true"
 
 import django
