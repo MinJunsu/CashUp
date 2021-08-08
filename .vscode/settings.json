@@ -1,0 +1,17 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "121.147.38.29",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "CashUp Server",
+            "username": "junsu",
+            "password": "wang0386",
+            "database": "django_insta"
+        }
+    ]
+}
