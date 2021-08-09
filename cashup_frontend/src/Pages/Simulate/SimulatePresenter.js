@@ -1,15 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import Simulation from 'Components/Simulation';
+
 const Container = styled.div`
 
 `;
 
-function SimulatePresenter() {
+function SimulatePresenter(props) {
     return (
         <Container>
-            Simulate
-        </Container>        
+            <Simulation setFormData={props.setFormData} result={props.result} columns={props.columns} data={props.data} loading={props.loading}/>
+        </Container>
     );
 };
 

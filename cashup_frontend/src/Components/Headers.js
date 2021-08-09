@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 
 const Container = styled.div`
     width: 100%;
-    height: 80px;
+    min-height: 60px;
 `;
 
-const Logo = styled.span`
+const Logo = styled(Link)`
     padding: 15px;
 `;
 
@@ -16,7 +16,7 @@ const List = styled.ul`
 `;
 
 const Element = styled(Link)`
-    padding: 10px 10px;
+    padding-top: 10px;
     margin-left: 5px;
     margin-right: 5px;
     font-size: 20px;
@@ -26,7 +26,7 @@ const Element = styled(Link)`
     :hover {
         border-bottom: 2px solid;
         color: #c79110;
-        transition: border-bottom 0.5s ease-in-out;    
+        transition: border-bottom 0.3s ease-in-out;    
     }
 `;
 
@@ -34,10 +34,10 @@ function Headers() {
     return (
         <Container>
             <List>
-                <Logo>CashUp</Logo>
-                <Element>내 정보</Element>
-                <Element>가상 거래 확인</Element>
-                <Element>실전 거래 확인</Element>
+                <Logo to='/'>CashUp</Logo>
+                <Element to='/status'>내 정보</Element>
+                <Element to='/simulate'>가상 거래 확인</Element>
+                <Element to='/trade'>실전 거래 확인</Element>
             </List>
         </Container>
     );
