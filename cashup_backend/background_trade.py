@@ -113,7 +113,7 @@ class AutoTrade:
         for account in self.test_trade_users:
             if TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_order_time=None), Q(buy_time=None)):
                 continue
-            result_query = TradeResult.objects.filter(Q(user=account['user']), ~Q(buy_time=None), Q(sell_order_time=None), Q(position=self.flag))
+            result_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None))
             buy_flag = False
             if self.flag:
                 if account['version'] == 1:
@@ -183,7 +183,7 @@ class AutoTrade:
 
     def check_price(self):
         for account in self.test_trade_users:
-            sell_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None))
+            sell_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None), Q(sell_time=None))
             if sell_query:
                 for element in sell_query:
                     element.calculate_earning_rate(now_price=self.now_price)
