@@ -183,7 +183,7 @@ class AutoTrade:
 
     def check_price(self):
         for account in self.test_trade_users:
-            sell_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None), Q(sell_order_time=None))
+            sell_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None))
             if sell_query:
                 for element in sell_query:
                     element.calculate_earning_rate(now_price=self.now_price)
@@ -242,7 +242,6 @@ class AutoTrade:
 
 if __name__ == "__main__":
     trade_list = [AutoTrade(True), AutoTrade(False)]
-
     for trade in trade_list:
         trade.check_price()
 
