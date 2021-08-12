@@ -3,5 +3,5 @@ from django.db import models
 
 # Create your models here.
 class User(AbstractUser):
-    is_test_trade = models.BooleanField(default=False)
-    is_real_trade = models.BooleanField(default=False)
+    api_key = models.CharField(max_length=30)
+    api_secret_key = models.CharField(max_length=30)

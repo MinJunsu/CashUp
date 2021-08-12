@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     ## Django Custom Apps
     'data.apps.DataConfig',
     'user.apps.UserConfig',
+    'trade.apps.TradeConfig',
 ]
 
 MIDDLEWARE = [

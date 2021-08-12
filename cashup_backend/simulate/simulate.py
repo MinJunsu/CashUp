@@ -764,17 +764,7 @@ class Simulate:
 
         last_signal = "UP(U)"
 
-        up_signal_flag = False
-        dn_signal_flag = False
         data_set = models.MinuteData.objects.filter(datetime__range=[start_date, end_date])
-        prev_up_time = data_set[0].datetime
-        prev_dn_time = data_set[0].datetime
-        up_signal_time = data_set[0].datetime
-        dn_signal_time = data_set[0].datetime
-        prev_up_signal = "fU(U)"
-        prev_dn_signal = "fD(D)"
-        prev_volume_rate = 0
-        prev_continue_up_down = "D1"
         down_count = 0
         up_count = 0
         last_fu_time = ""
@@ -785,17 +775,8 @@ class Simulate:
         for element in data_set:
             now_work = ""
 
-            volume_flag = False
-            if (element.volume_rate > 1) or (prev_volume_rate > 1):
-                volume_flag = True
-
             if self.set_work(element) != "":
                 now_work, work = self.set_work(element), self.set_work(element)
-
-            if element.hour_up_down != "":
-                prev_up_down = element.hour_up_down
-                    
-            now_time = element.datetime
 
             if element.volume_up_dn == "UP":
                 if len(self.max_price_list) > 3:
@@ -815,7 +796,6 @@ class Simulate:
                     last_fd_flag = True
                     if element.up_down == "D":
                         down_count += 1
-                
 
             if trade_dict['buy_order_time'] == "":
                 # work 발생
