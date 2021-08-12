@@ -109,6 +109,22 @@ class AutoTrade:
         if last_fd_flag and down_count > 2:
             self.version_3_short_flag = True
 
+    def get_order_price(self, is_buy, rate_option):
+        if is_buy:
+            if self.flag:
+                price = self.now_price * (1 - (rate_option / 10000))
+                return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
+            else:
+                price = self.now_price * (1 + (rate_option / 10000))
+                return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
+        else:
+            if self.flag:
+                price = self.now_price * (1 + (rate_option / 10000))
+                return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
+            else:
+                price = self.now_price * (1 - (rate_option / 10000))
+                return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
+
     def buy_order(self):
         for account in self.test_trade_users:
             if TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_order_time=None), Q(buy_time=None)):
@@ -145,7 +161,7 @@ class AutoTrade:
                             version=account['version'],
                             buy_order_time=datetime.now(),
                             amount=100,
-                            buy_price=self.now_price * (1 - (account['buy_rate_option'] / 10000))
+                            buy_price=self.get_order_price(True, account['buy_rate_option'])
                         )
                     else:
                         TradeResult.objects.create(
@@ -154,7 +170,7 @@ class AutoTrade:
                             version=account['version'],
                             buy_order_time=datetime.now(),
                             amount=100,
-                            buy_price=self.now_price * (1 + (account['buy_rate_option'] / 10000))
+                            buy_price=self.get_order_price(True, account['buy_rate_option'])
                         )
                 elif len(result_query) > 0:
                     prev_trade = result_query.last()
@@ -168,7 +184,7 @@ class AutoTrade:
                                 version=account['version'],
                                 buy_order_time=datetime.now(),
                                 amount=prev_amount,
-                                buy_price=self.now_price * (1 - (account['buy_rate_option'] / 10000))
+                                buy_price=self.get_order_price(True, account['buy_rate_option'])
                             )
                     else:
                         if self.now_price * (1 + (account['buy_rate_option'] / 10000)) < prev_price:
@@ -178,7 +194,7 @@ class AutoTrade:
                                 version=account['version'],
                                 buy_order_time=datetime.now(),
                                 amount=prev_amount,
-                                buy_price=self.now_price * (1 + (account['buy_rate_option'] / 10000))
+                                buy_price=self.get_order_price(True, account['buy_rate_option'])
                             )
 
     def check_price(self):
@@ -234,11 +250,16 @@ class AutoTrade:
                     element.save()
 
             if earning_rate_sum > 0:
-                for element in sell_query:
-                    element.sell_order_time = datetime.now()
-                    element.sell_price = self.now_price * (1 + (account['sell_rate_option'] / 10000))
-                    element.save()
-
+                if self.flag:
+                    for element in sell_query:
+                        element.sell_order_time = datetime.now()
+                        element.sell_price = self.get_order_price(False, account['sell_rate_option'])
+                        element.save()
+                else:
+                    for element in sell_query:
+                        element.sell_order_time = datetime.now()
+                        element.sell_price = self.get_order_price(False, account['sell_rate_option'])
+                        element.save()
 
 if __name__ == "__main__":
     trade_list = [AutoTrade(True), AutoTrade(False)]
