@@ -23,25 +23,27 @@ class TradeResult(models.Model):
     sell_order_time = models.DateTimeField(null=True, blank=True)
     sell_time = models.DateTimeField(null=True, blank=True)
     sell_price = models.FloatField(default=0)
-    max_rate = models.DecimalField(default=0, max_digits=5, decimal_places=2)
-    min_rate = models.DecimalField(default=0, max_digits=5, decimal_places=2)
-    earning_rate = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+    max_rate = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    min_rate = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    earning_rate = models.DecimalField(default=0, max_digits=10, decimal_places=2)
     
     def calculate_earning_rate(self, now_price):
         if self.position:
             if self.buy_price > now_price:
-                self.earning_rate = -((round((self.buy_price - now_price) / self.buy_price, 4)) * 100)
+                self.earning_rate = round(-(((self.buy_price - now_price) / self.buy_price) * 100), 4) * 100
             else:
-                self.earning_rate = (round(now_price / self.buy_price, 4) - 1) * 100
+                self.earning_rate = round(((now_price / self.buy_price) - 1) * 100, 4) * 100
+            print(self.earning_rate)
             if self.earning_rate > self.max_rate:
                 self.max_rate = self.earning_rate
             if self.min_rate > self.earning_rate:
                 self.min_rate = self.earning_rate
         else:
             if self.buy_price > now_price:
-                self.earning_rate = (round((self.buy_price - now_price) / self.buy_price, 4)) * 100
+                self.earning_rate = round(((self.buy_price - now_price) / self.buy_price) * 100, 4) * 100
             else:
-                self.earning_rate = -(round(now_price / self.buy_price, 4) - 1) * 100
+                self.earning_rate = round(-((now_price / self.buy_price) - 1) * 100, 4) * 100
+            print(self.earning_rate)
             if self.earning_rate > self.max_rate:
                 self.max_rate = self.earning_rate
             if self.min_rate > self.earning_rate:
