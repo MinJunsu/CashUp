@@ -40,6 +40,7 @@ class AutoTrade:
         self.get_accounts()
         self.version_2_is_buy(minute_data)
         self.version_3_is_buy(minute_data)
+        print(f'version2: ({self.version_2_long_flag}, {self.version_2_short_flag}) , version3: ({self.version_3_long_flag}, {self.version_3_short_flag})')
 
     def get_accounts(self):
         user_query = TradeSetting.objects.all()
@@ -63,7 +64,8 @@ class AutoTrade:
         last_signal = ""
         last_up_down = ""
         for element in data:
-            last_signal = element.signal
+            if element.signal != "":
+                last_signal = element.signal
             last_up_down = element.up_down
 
         if last_signal == 'fD(D)' and last_up_down == "U":
@@ -127,9 +129,9 @@ class AutoTrade:
 
     def buy_order(self):
         for account in self.test_trade_users:
-            if TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_order_time=None), Q(buy_time=None)):
+            if TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), Q(buy_time=None), ~Q(buy_order_time=None)):
                 continue
-            result_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None))
+            result_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None), Q(sell_order_time=None))
             buy_flag = False
             if self.flag:
                 if account['version'] == 1:
@@ -163,6 +165,7 @@ class AutoTrade:
                             amount=100,
                             buy_price=self.get_order_price(True, account['buy_rate_option'])
                         )
+                        print("구매 호가")
                     else:
                         TradeResult.objects.create(
                             position=self.flag,
@@ -172,6 +175,7 @@ class AutoTrade:
                             amount=100,
                             buy_price=self.get_order_price(True, account['buy_rate_option'])
                         )
+                        print("구매 호가")
                 elif len(result_query) > 0:
                     prev_trade = result_query.last()
                     prev_amount, prev_price = prev_trade.amount, prev_trade.buy_price
@@ -186,6 +190,7 @@ class AutoTrade:
                                 amount=prev_amount,
                                 buy_price=self.get_order_price(True, account['buy_rate_option'])
                             )
+                            print("구매 호가")
                     else:
                         if self.now_price * (1 + (account['buy_rate_option'] / 10000)) < prev_price:
                             TradeResult.objects.create(
@@ -196,6 +201,7 @@ class AutoTrade:
                                 amount=prev_amount,
                                 buy_price=self.get_order_price(True, account['buy_rate_option'])
                             )
+                            print("구매 호가")
 
     def check_price(self):
         for account in self.test_trade_users:
@@ -260,6 +266,7 @@ class AutoTrade:
                         element.sell_order_time = datetime.now()
                         element.sell_price = self.get_order_price(False, account['sell_rate_option'])
                         element.save()
+
 
 if __name__ == "__main__":
     trade_list = [AutoTrade(True), AutoTrade(False)]
