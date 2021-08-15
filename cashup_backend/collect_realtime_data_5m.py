@@ -298,7 +298,7 @@ for count in range(len(req)):
         now_work_1_5_2 = "w" + now_work_1_5_2
     
 
-    if count > 990:
+    if count > 890:
         default = {
             'datetime': datetime,
             'open_price': open_price,
