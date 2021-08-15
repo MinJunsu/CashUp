@@ -26,6 +26,9 @@ last_time_1_5_1 = datetime.now()
 last_time_1_0_2 = datetime.now()
 last_time_1_5_2 = datetime.now()
 
+base_price = 0
+prev_signal = ""
+
 last_dn, last_up = "", ""
 
 max_price, min_price = 0, 0
@@ -37,6 +40,7 @@ start = 0
 last_up = 0
 last_dn = 0
 hour_up_down = ""
+flow = ""
 
 URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBT&binSize=5m&partial=true&count=1000&reverse=true"
 req = requests.get(URL).json()
@@ -157,6 +161,25 @@ for count in range(len(req)):
                 else:
                     signal = "fU(D)"
                     signal_price = max(up_list)
+    if base_price != 0:
+        if prev_signal == "fU(D)":
+            if high_price > base_price:
+                flow = "UP"
+            else:
+                flow = "DN"
+        if prev_signal == "fD(U)":
+            if low_price > base_price:
+                flow = "UP"
+            else:
+                flow = "DN"
+
+    if signal == "fU(D)":
+        base_price = high_price
+        prev_signal = signal
+
+    if signal == "fD(U)":
+        base_price = low_price
+        prev_signal = signal
 
     if volume_up_dn == "UP":
         if (max_price < high_price) and (volume_rate > 1):
@@ -286,6 +309,7 @@ for count in range(len(req)):
             'volume': volume,
             'volume_rate': volume_rate,
             'volume_up_dn': volume_up_dn,
+            'flow': flow,
             'up_down': UD,
             'continue_up_down': continue_up_down,
             'hour_up_down': hour_up_down,

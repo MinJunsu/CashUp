@@ -36,6 +36,7 @@ class MinuteData(models.Model):
     volume = models.BigIntegerField(verbose_name='거래량')
     volume_rate = models.FloatField(verbose_name='거래량 비')
     volume_up_dn = models.CharField(max_length=2, null=True, verbose_name="거래량 UP/DN")
+    flow = models.CharField(max_length=2, verbose_name='흐름')
     up_down = models.CharField(max_length=2, verbose_name='UD')
     continue_up_down = models.CharField(max_length=3, verbose_name='연속 UD')
     hour_up_down = models.CharField(max_length=6, verbose_name='4시간 UD')

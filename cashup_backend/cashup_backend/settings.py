@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     ## Django Third Party Apps
-    'background_task',
     'rest_framework',
     'corsheaders',
     
