@@ -46,8 +46,8 @@ prev_signal_down_price = 0
 URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBT&binSize=1h&partial=true&count=1000&reverse=true"
 req = requests.get(URL).json()
 req.reverse()
-for count in range(len(req)):
-    data = req[count]
+for num_count in range(len(req)):
+    data = req[num_count]
     volume_up_dn = ""
     signal = ""
     signal_price = 0
@@ -151,7 +151,7 @@ for count in range(len(req)):
                 min_price_list = []
                 for idx, element in enumerate(other_up_dn_list):
                     if element == "D":
-                        count + 1
+                        count += 1
                         max_price_list.append(dn_list[idx])
                     min_price_list.append(up_list[idx])
                     if count == 3:
@@ -187,9 +187,11 @@ for count in range(len(req)):
                 count = 0
                 max_price_list = []
                 min_price_list = []
+                print(datetime)
                 for idx, element in enumerate(other_up_dn_list):
+                    print(idx, element)
                     if element == "U":
-                        count + 1
+                        count += 1
                         min_price_list.append(up_list[idx])
                     max_price_list.append(dn_list[idx])
                     if count == 3:
@@ -332,9 +334,9 @@ for count in range(len(req)):
 
     if now_work_1_5_2 != "":
         now_work_1_5_2 = "w" + now_work_1_5_2
-    
 
-    if count > 990:
+    if num_count > 990:
+        print("실행")
         default = {
             'datetime': datetime,
             'open_price': open_price,
@@ -349,7 +351,6 @@ for count in range(len(req)):
             'continue_up_down': continue_up_down,
             'hour_up_down': hour_up_down,
             'signal': signal,
-            'signal_price': signal_price,
             'work_two_1_0': now_work_1_0_1,
             'work_two_1_5': now_work_1_5_1,
             'work_one_1_0': now_work_1_0_2,

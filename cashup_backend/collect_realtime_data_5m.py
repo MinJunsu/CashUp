@@ -64,8 +64,8 @@ up_flow_confirm_list = []
 URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBT&binSize=5m&partial=true&count=1000&reverse=true"
 req = requests.get(URL).json()
 req.reverse()
-for count in range(len(req)):
-    data = req[count]
+for num_count in range(len(req)):
+    data = req[num_count]
     print(data)
     volume_up_dn = ""
     signal = ""
@@ -170,7 +170,7 @@ for count in range(len(req)):
                 min_price_list = []
                 for idx, element in enumerate(other_up_dn_list):
                     if element == "D":
-                        count + 1
+                        count += 1
                         max_price_list.append(dn_list[idx])
                     min_price_list.append(up_list[idx])
                     if count == 3:
@@ -208,7 +208,7 @@ for count in range(len(req)):
                 min_price_list = []
                 for idx, element in enumerate(other_up_dn_list):
                     if element == "U":
-                        count + 1
+                        count += 1
                         min_price_list.append(up_list[idx])
                     max_price_list.append(dn_list[idx])
                     if count == 3:
@@ -512,7 +512,7 @@ for count in range(len(req)):
             }
             DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
 
-    if count > 980:
+    if num_count > 980:
         default = {
             'datetime': datetime,
             'open_price': open_price,
