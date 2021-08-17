@@ -198,7 +198,7 @@ for num_count in range(len(req)):
                         signal = "fU(0)"
                     else:
                         signal = "fU(D)"
-                    prev_signal_down_price = max(dn_list)
+                    prev_signal_up_price = max(dn_list)
             else:
                 other_up_dn_list.reverse()
                 up_list.reverse()
@@ -215,13 +215,13 @@ for num_count in range(len(req)):
                         break
                 if prev_up_down == "U" and min(min_price_list) == min_price_list[2]:
                     if prev_signal_down_price != 0:
-                        if prev_signal_down_price < max(max_price_list):
+                        if prev_signal_up_price < max(max_price_list):
                             signal = "fU(U)"
-                        elif prev_signal_down_price == max(max_price_list):
+                        elif prev_signal_up_price == max(max_price_list):
                             signal = "fU(0)"
                         else:
                             signal = "fU(D)"
-                    prev_signal_down_price = max(max_price_list)
+                    prev_signal_up_price = max(max_price_list)
                 other_up_dn_list.reverse()
                 up_list.reverse()
                 dn_list.reverse()
