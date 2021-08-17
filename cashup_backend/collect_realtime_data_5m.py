@@ -437,7 +437,7 @@ for count in range(len(req)):
                 down_flow_element_list.append(flow_element)
 
                 if len(down_flow_element_list) > 1:
-                    if down_flow_confirm_list[0].down_flow_confirm is None and flow_element.down_flow_confirm == "DN":
+                    if down_flow_element_list[0].down_flow_confirm is None and flow_element.down_flow_confirm == "DN":
                         flow_element.down_flow_trade = "B#2"
 
             if flag and flow_element.up_flow:
