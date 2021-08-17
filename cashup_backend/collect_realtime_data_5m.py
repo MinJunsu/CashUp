@@ -149,18 +149,6 @@ for count in range(len(req)):
             hour_up_down = "DN(D)"
         last_dn = low_price
 
-    if len(dn_list) > 5:
-        dn_list.pop(0)
-    dn_list.append(high_price)
-
-    if len(up_list) > 5:
-        up_list.pop(0)
-    up_list.append(low_price)
-
-    if len(other_up_dn_list) > 5:
-        other_up_dn_list.pop(0)
-    other_up_dn_list.append(UD)
-
     if UD == "U":
         if other_up_dn_list.count("D") > 2:
             if other_up_dn_list.count("D") == 6:
@@ -237,6 +225,18 @@ for count in range(len(req)):
                 other_up_dn_list.reverse()
                 up_list.reverse()
                 dn_list.reverse()
+
+    if len(dn_list) > 5:
+        dn_list.pop(0)
+    dn_list.append(high_price)
+
+    if len(up_list) > 5:
+        up_list.pop(0)
+    up_list.append(low_price)
+
+    if len(other_up_dn_list) > 5:
+        other_up_dn_list.pop(0)
+    other_up_dn_list.append(UD)
 
     if volume_up_dn == "UP":
         if (max_price < high_price) and (volume_rate > 1):
