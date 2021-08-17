@@ -1,5 +1,4 @@
 django
 pillow
 django-cors-headers
-djangorestframework
-mysqlclient
+django-rest-framework

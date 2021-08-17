@@ -432,16 +432,13 @@ for count in range(len(req)):
                 elif down_flow_list[-2:] == ['UP', 'UP']:
                     flow_element.down_flow_trade = "S#2"
 
-                if len(down_flow_element_list) > 2:
+                if len(down_flow_element_list) > 1:
                     down_flow_element_list.pop(0)
-                    down_flow_confirm_list.pop(0)
                 down_flow_element_list.append(flow_element)
-                down_flow_confirm_list.append(flow_element.down_flow_confirm)
 
-                if len(down_flow_element_list) > 2:
-                    if down_flow_confirm_list.count("DN") == 1 and down_flow_confirm_list[1] == "DN":
-                        down_flow_element_list[1].down_flow_trade = "B#3"
-                        down_flow_element_list[1].save()
+                if len(down_flow_element_list) > 1:
+                    if down_flow_confirm_list[0].down_flow_confirm is None and flow_element.down_flow_confirm == "DN":
+                        flow_element.down_flow_trade = "B#2"
 
             if flag and flow_element.up_flow:
                 if last_up_flow_time != "":
@@ -456,19 +453,33 @@ for count in range(len(req)):
                 elif up_flow_list[-2:] == ['DN', 'DN']:
                     flow_element.up_flow_trade = "B#2"
 
-                if len(up_flow_element_list) > 2:
+                if len(up_flow_element_list) > 1:
                     up_flow_element_list.pop(0)
-                    up_flow_confirm_list.pop(0)
                 up_flow_element_list.append(flow_element)
-                up_flow_confirm_list.append(flow_element.up_flow_confirm)
 
-                if len(up_flow_element_list) > 2:
-                    if up_flow_confirm_list.count("UP") == 1 and up_flow_confirm_list[1] == "UP":
-                        up_flow_element_list[1].up_flow_trade = "S#3"
-                        up_flow_element_list[1].save()
+                if len(up_flow_element_list) > 1:
+                    if up_flow_element_list[0].up_flow_confirm is None and flow_element.up_flow_confirm == "UP":
+                        flow_element.down_flow_trade = "S#2"
 
     if flow_element:
-        flow_element.save()
+        if type(flow_element) == UpFlow:
+            default = {
+                'datetime': flow_element.datetime,
+                'base_price': flow_element.base_price,
+                'up_flow': flow_element.up_flow,
+                'up_flow_confirm': flow_element.up_flow_confirm,
+                'up_flow_trade': flow_element.up_flow_trade
+            }
+            UpFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
+        else:
+            default = {
+                'datetime': flow_element.datetime,
+                'base_price': flow_element.base_price,
+                'down_flow': flow_element.down_flow,
+                'down_flow_confirm': flow_element.down_flow_confirm,
+                'down_flow_trade': flow_element.down_flow_trade
+            }
+            DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
 
     if count > 980:
         default = {
