@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 class TradeSetting(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     test_trade = models.BooleanField(default=True)
     real_trade = models.BooleanField(default=False)
     version = models.IntegerField(default=1)

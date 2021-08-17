@@ -147,48 +147,77 @@ for count in range(len(req)):
             if other_up_dn_list.count("D") == 6:
                 if prev_up_down == "D" and max(dn_list) == dn_list[0]:
                     if prev_signal_down_price != 0:
-                        if prev_signal_down_price <= dn_list[0]:
+                        if prev_signal_down_price < min(up_list):
                             signal = "fD(U)"
+                        elif prev_signal_down_price == min(up_list):
+                            signal = "fD(0)"
                         else:
                             signal = "fD(D)"
-                        signal_price = min(dn_list)
-                    prev_signal_down_price = dn_list[0]
+                    prev_signal_down_price = min(up_list)
             else:
-                if prev_up_down == "D" and max(new_dn_list) == new_dn_list[0]:
+                other_up_dn_list.reverse()
+                up_list.reverse()
+                dn_list.reverse()
+                count = 0
+                max_price_list = []
+                min_price_list = []
+                for idx, element in enumerate(other_up_dn_list):
+                    if element == "D":
+                        count + 1
+                        max_price_list.append(dn_list[idx])
+                    min_price_list.append(up_list[idx])
+                    if count == 3:
+                        break
+                if prev_up_down == "D" and max(max_price_list) == max_price_list[2]:
                     if prev_signal_down_price != 0:
-                        if prev_signal_down_price <= new_dn_list[0]:
+                        if prev_signal_down_price < min(min_price_list):
                             signal = "fD(U)"
+                        elif prev_signal_down_price == min(min_price_list):
+                            signal = "fD(0)"
                         else:
                             signal = "fD(D)"
-                        signal_price = min(new_dn_list)
-                    prev_signal_down_price = new_dn_list[0]
-        if len(new_up_list) > 2:
-            new_up_list.pop(0)
-        new_up_list.append(low_price)
+                    prev_signal_down_price = min(min_price_list)
+                other_up_dn_list.reverse()
+                up_list.reverse()
+                dn_list.reverse()
 
     if UD == "D":
         if other_up_dn_list.count("U") > 2:
             if other_up_dn_list.count("U") == 6:
                 if prev_up_down == "U" and min(up_list) == up_list[0]:
-                    if prev_signal_up_price != 0:
-                        if prev_signal_up_price <= up_list[0]:
-                            signal = "fU(U)"
-                        else:
-                            signal = "fU(D)"
-                        signal_price = max(up_list)
-                    prev_signal_down_price = up_list[0]
+                    if prev_signal_up_price < max(dn_list):
+                        signal = "fU(U)"
+                    elif prev_signal_up_price == max(dn_list):
+                        signal = "fU(0)"
+                    else:
+                        signal = "fU(D)"
+                    prev_signal_down_price = max(dn_list)
             else:
-                if prev_up_down == "U" and min(new_up_list) == new_up_list[0]:
-                    if prev_signal_up_price != 0:
-                        if prev_signal_up_price <= new_up_list[0]:
+                other_up_dn_list.reverse()
+                up_list.reverse()
+                dn_list.reverse()
+                count = 0
+                max_price_list = []
+                min_price_list = []
+                for idx, element in enumerate(other_up_dn_list):
+                    if element == "U":
+                        count + 1
+                        min_price_list.append(up_list[idx])
+                    max_price_list.append(dn_list[idx])
+                    if count == 3:
+                        break
+                if prev_up_down == "U" and min(min_price_list) == min_price_list[2]:
+                    if prev_signal_down_price != 0:
+                        if prev_signal_down_price < max(max_price_list):
                             signal = "fU(U)"
+                        elif prev_signal_down_price == max(max_price_list):
+                            signal = "fU(0)"
                         else:
                             signal = "fU(D)"
-                        signal_price = max(new_up_list)
-                    prev_signal_up_price = new_up_list[0]
-        if len(new_dn_list) > 2:
-            new_dn_list.pop(0)
-        new_dn_list.append(high_price)
+                    prev_signal_down_price = max(max_price_list)
+                other_up_dn_list.reverse()
+                up_list.reverse()
+                dn_list.reverse()
 
     if volume_up_dn == "UP":
         if (max_price < high_price) and (volume_rate > 1):
