@@ -13,6 +13,8 @@ up_dn_list = []
 last_data = []
 dn_list = []
 up_list = []
+new_dn_list = []
+new_up_list = []
 other_up_dn_list = []
 
 continue_up_down = "D0"
@@ -36,7 +38,10 @@ prev_high = 100000
 start = 0
 last_up = 0
 last_dn = 0
+volume_up_dn = ""
 hour_up_down = ""
+prev_signal_up_price = 0
+prev_signal_down_price = 0
 
 URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBT&binSize=1h&partial=true&count=1000&reverse=true"
 req = requests.get(URL).json()
@@ -128,34 +133,62 @@ for count in range(len(req)):
     if len(dn_list) > 5:
         dn_list.pop(0)
     dn_list.append(high_price)
-        
+
     if len(up_list) > 5:
         up_list.pop(0)
     up_list.append(low_price)
-    
+
     if len(other_up_dn_list) > 5:
         other_up_dn_list.pop(0)
     other_up_dn_list.append(UD)
-        
+
     if UD == "U":
         if other_up_dn_list.count("D") > 2:
-            if prev_up_down == "D" and max(dn_list) == dn_list[0]:
-                if min(dn_list) <= low_price:
-                    signal = "fD(U)"
-                    signal_price = min(dn_list)
-                else:
-                    signal = "fD(D)"
-                    signal_price = min(dn_list)
-    
+            if other_up_dn_list.count("D") == 6:
+                if prev_up_down == "D" and max(dn_list) == dn_list[0]:
+                    if prev_signal_down_price != 0:
+                        if prev_signal_down_price <= dn_list[0]:
+                            signal = "fD(U)"
+                        else:
+                            signal = "fD(D)"
+                        signal_price = min(dn_list)
+                    prev_signal_down_price = dn_list[0]
+            else:
+                if prev_up_down == "D" and max(new_dn_list) == new_dn_list[0]:
+                    if prev_signal_down_price != 0:
+                        if prev_signal_down_price <= new_dn_list[0]:
+                            signal = "fD(U)"
+                        else:
+                            signal = "fD(D)"
+                        signal_price = min(new_dn_list)
+                    prev_signal_down_price = new_dn_list[0]
+        if len(new_up_list) > 2:
+            new_up_list.pop(0)
+        new_up_list.append(low_price)
+
     if UD == "D":
         if other_up_dn_list.count("U") > 2:
-            if prev_up_down == "U" and min(up_list) == up_list[0]:
-                if max(up_list) <= high_price:
-                    signal = "fU(U)"
-                    signal_price = max(up_list)
-                else:
-                    signal = "fU(D)"
-                    signal_price = max(up_list)
+            if other_up_dn_list.count("U") == 6:
+                if prev_up_down == "U" and min(up_list) == up_list[0]:
+                    if prev_signal_up_price != 0:
+                        if prev_signal_up_price <= up_list[0]:
+                            signal = "fU(U)"
+                        else:
+                            signal = "fU(D)"
+                        signal_price = max(up_list)
+                    prev_signal_down_price = up_list[0]
+            else:
+                if prev_up_down == "U" and min(new_up_list) == new_up_list[0]:
+                    if prev_signal_up_price != 0:
+                        if prev_signal_up_price <= new_up_list[0]:
+                            signal = "fU(U)"
+                        else:
+                            signal = "fU(D)"
+                        signal_price = max(new_up_list)
+                    prev_signal_up_price = new_up_list[0]
+        if len(new_dn_list) > 2:
+            new_dn_list.pop(0)
+        new_dn_list.append(high_price)
 
     if volume_up_dn == "UP":
         if (max_price < high_price) and (volume_rate > 1):
@@ -231,8 +264,7 @@ for count in range(len(req)):
                 work_1_0_2 = "D1"
 
             now_work_1_0_2 = work_1_0_2
-            last_time_1_0_2 = datetime     
-
+            last_time_1_0_2 = datetime
 
         if (max_price < high_price and min_price < low_price) and (volume_rate > 1.5):
             if work_1_5_2[0] == "U":
