@@ -333,7 +333,7 @@ for num_count in range(len(req)):
     if now_work_1_5_2 != "":
         now_work_1_5_2 = "w" + now_work_1_5_2
 
-    if num_count > 900:
+    if num_count > 990:
         print("실행")
         default = {
             'datetime': datetime,
