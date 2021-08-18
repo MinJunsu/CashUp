@@ -528,7 +528,6 @@ for num_count in range(len(req)):
             'continue_up_down': continue_up_down,
             'hour_up_down': hour_up_down,
             'signal': signal,
-            'signal_price': signal_price,
             'work_two_1_0': now_work_1_0_1,
             'work_two_1_5': now_work_1_5_1,
             'work_one_1_0': now_work_1_0_2,
