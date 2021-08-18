@@ -356,12 +356,12 @@ for num_count in range(len(req)):
     flow = ""
     if flow_base_price != 0:
         if prev_signal == "fU(D)":
-            if high_price > flow_base_price:
+            if low_price > flow_base_price:
                 flow = "UP"
             else:
                 flow = "DN"
         if prev_signal == "fD(U)":
-            if low_price > flow_base_price:
+            if high_price > flow_base_price:
                 flow = "UP"
             else:
                 flow = "DN"
