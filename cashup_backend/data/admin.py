@@ -11,7 +11,7 @@ class HourDataAdmin(admin.ModelAdmin):
 
 @admin.register(MinuteData)
 class MinuteDataAdmin(admin.ModelAdmin):
-    list_display = ['datetime', 'open_price', 'min_price', 'max_price', 'close_price', 'flow', 'signal']
+    list_display = ['datetime', 'open_price', 'min_price', 'max_price', 'close_price', 'up_down', 'flow', 'signal']
 
 @admin.register(UpFlow)
 class UpFlowAdmin(admin.ModelAdmin):
