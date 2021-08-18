@@ -66,7 +66,6 @@ req = requests.get(URL).json()
 req.reverse()
 for num_count in range(len(req)):
     data = req[num_count]
-    print(data)
     volume_up_dn = ""
     signal = ""
     signal_price = 0
