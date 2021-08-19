@@ -9,8 +9,8 @@ django.setup()
 
 from data.models import UpFlow, DownFlow
 
-up_flow_list = UpFlow.objects.filter(id__gte=(UpFlow.objects.last().id)-100)
-down_flow_list = DownFlow.objects.filter(id__gte=(DownFlow.objects.last().id)-100)
+up_flow_list = UpFlow.objects.filter(id__gte=(UpFlow.objects.last().id) - 300)
+down_flow_list = DownFlow.objects.filter(id__gte=(DownFlow.objects.last().id) - 300)
 up_flow_up_down_list = []
 up_flow_confirm_list = []
 up_flow_element_list = []
@@ -26,6 +26,7 @@ for element in up_flow_list:
     up_flow_up_down_list.append(element.up_flow)
     up_flow_confirm_list.append(element.up_flow_confirm)
     up_flow_element_list.append(element)
+
     if len(up_flow_up_down_list) > 4:
         # Version 4
         if up_flow_up_down_list.count("UP") == 5:
@@ -40,7 +41,7 @@ for element in up_flow_list:
             up_flow_element_list[3].up_flow_trade = "S#1"
             up_flow_element_list[3].save()
         # Version 3
-        if up_flow_up_down_list[3] == "UP" and up_flow_up_down_list[4] == "UP" and down_flow_confirm_list[4] != "UP":
+        if up_flow_up_down_list[3] == "UP" and up_flow_up_down_list[4] == "UP" and up_flow_confirm_list[4] != "UP":
             element.up_flow_trade = "S#3"
             element.save()
 
