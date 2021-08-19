@@ -404,9 +404,6 @@ for num_count in range(len(req)):
                 if down_flow_list.count("DN") > 3:
                     flow_element.down_flow_confirm = "DN"
 
-                if down_flow_list.count("UP") == 5:
-                    flow_element.down_flow_trade("B#4")
-
         prev_down_flow = flow_element_list[1]['max_price']
 
     if flow_list == up_flow:
@@ -430,84 +427,26 @@ for num_count in range(len(req)):
                 if up_flow_list.count("DN") > 3:
                     flow_element.up_flow_confirm = "DN"
 
-                if up_flow_list.count("DN") == 5:
-                    flow_element.up_flow_trade("S#4")
-
         prev_up_flow = flow_element_list[1]['min_price']
 
-    if len(flow_element_list) > 3:
-        if flow_element:
-            flag = False
-            if type(flow_element) == UpFlow:
-                flag = True
-
-            if not flag and flow_element.down_flow_confirm == "UP":
-                last_down_flow_time = flow_element_list[1]['datetime']
-
-            if flag and flow_element.up_flow_confirm == "DN":
-                last_up_dlow_time = flow_element_list[1]['datetime']
-
-            if not flag and flow_element.down_flow:
-                if last_down_flow_time != "":
-                    if flow_element_list[1]['datetime'] - last_down_flow_time > timedelta(hours=2):
-                        if HourData.objects.filter(datetime__range=[last_down_flow_time,
-                                                                    flow_element_list[1]['datetime'] - timedelta(
-                                                                            hours=1)], up_down='U').values(
-                                'up_down').count() > 1:
-                            flow_element.down_flow_trade = "S#1"
-                            last_down_flow_time = ""
-
-                elif down_flow_list[-2:] == ['UP', 'UP']:
-                    flow_element.down_flow_trade = "S#2"
-
-                if len(down_flow_element_list) > 1:
-                    down_flow_element_list.pop(0)
-                down_flow_element_list.append(flow_element)
-
-                if len(down_flow_element_list) > 1:
-                    if down_flow_element_list[0].down_flow_confirm is None and flow_element.down_flow_confirm == "DN":
-                        flow_element.down_flow_trade = "B#2"
-
-            if flag and flow_element.up_flow:
-                if last_up_flow_time != "":
-                    if flow_element_list[1]['datetime'] - last_up_flow_time > timedelta(hours=2):
-                        if HourData.objects.filter(datetime__range=[last_up_flow_time,
-                                                                    flow_element_list[1]['datetime'] - timedelta(
-                                                                            hours=1)], up_down='D').values(
-                                'up_down').count() > 1:
-                            flow_element.up_flow_trade = "B#1"
-                            last_up_flow_time = ""
-
-                elif up_flow_list[-2:] == ['DN', 'DN']:
-                    flow_element.up_flow_trade = "B#2"
-
-                if len(up_flow_element_list) > 1:
-                    up_flow_element_list.pop(0)
-                up_flow_element_list.append(flow_element)
-
-                if len(up_flow_element_list) > 1:
-                    if up_flow_element_list[0].up_flow_confirm is None and flow_element.up_flow_confirm == "UP":
-                        flow_element.down_flow_trade = "S#2"
-
     if flow_element:
-        if type(flow_element) == UpFlow:
-            default = {
-                'datetime': flow_element.datetime,
-                'base_price': flow_element.base_price,
-                'up_flow': flow_element.up_flow,
-                'up_flow_confirm': flow_element.up_flow_confirm,
-                'up_flow_trade': flow_element.up_flow_trade
-            }
-            UpFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
-        else:
-            default = {
-                'datetime': flow_element.datetime,
-                'base_price': flow_element.base_price,
-                'down_flow': flow_element.down_flow,
-                'down_flow_confirm': flow_element.down_flow_confirm,
-                'down_flow_trade': flow_element.down_flow_trade
-            }
-            DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
+        if num_count != 999:
+            if type(flow_element) == UpFlow:
+                default = {
+                    'datetime': flow_element.datetime,
+                    'base_price': flow_element.base_price,
+                    'up_flow': flow_element.up_flow,
+                    'up_flow_confirm': flow_element.up_flow_confirm
+                }
+                UpFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
+            else:
+                default = {
+                    'datetime': flow_element.datetime,
+                    'base_price': flow_element.base_price,
+                    'down_flow': flow_element.down_flow,
+                    'down_flow_confirm': flow_element.down_flow_confirm
+                }
+                DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
 
     if num_count > 980:
         default = {
