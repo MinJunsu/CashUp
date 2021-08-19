@@ -64,7 +64,7 @@ for element in down_flow_list:
             down_flow_element_list[3].down_flow_trade = "S#2"
             down_flow_element_list[3].save()
         # Version 1
-        if down_flow_confirm_list[3] == "DN" and up_flow_confirm_list[4] is None:
+        if down_flow_confirm_list[3] == "DN" and down_flow_confirm_list[4] is None:
             down_flow_element_list[3].down_flow_trade = "B#1"
             down_flow_element_list[3].save()
         # Version 3
