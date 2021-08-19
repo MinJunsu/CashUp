@@ -15,6 +15,7 @@ class TradeSetting(models.Model):
 class TradeResult(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     position = models.BooleanField(default=False)
+    signal_time = models.DateTimeField(null=True, blank=True)
     buy_order_time = models.DateTimeField(null=True, blank=True)
     buy_time = models.DateTimeField(null=True, blank=True)
     amount = models.IntegerField(default=100)
@@ -33,7 +34,6 @@ class TradeResult(models.Model):
                 self.earning_rate = round(-(((self.buy_price - now_price) / self.buy_price) * 100), 4) * 100
             else:
                 self.earning_rate = round(((now_price / self.buy_price) - 1) * 100, 4) * 100
-            print(self.earning_rate)
             if self.earning_rate > self.max_rate:
                 self.max_rate = self.earning_rate
             if self.min_rate > self.earning_rate:
@@ -43,7 +43,6 @@ class TradeResult(models.Model):
                 self.earning_rate = round(((self.buy_price - now_price) / self.buy_price) * 100, 4) * 100
             else:
                 self.earning_rate = round(-((now_price / self.buy_price) - 1) * 100, 4) * 100
-            print(self.earning_rate)
             if self.earning_rate > self.max_rate:
                 self.max_rate = self.earning_rate
             if self.min_rate > self.earning_rate:
