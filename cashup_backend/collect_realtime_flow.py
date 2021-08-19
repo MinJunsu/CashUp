@@ -40,7 +40,7 @@ for element in up_flow_list:
             up_flow_element_list[3].up_flow_trade = "S#1"
             up_flow_element_list[3].save()
         # Version 3
-        if up_flow_up_down_list[3] == "UP" and up_flow_up_down_list[4] == "UP":
+        if up_flow_up_down_list[3] == "UP" and up_flow_up_down_list[4] == "UP" and down_flow_confirm_list[4] != "UP":
             element.up_flow_trade = "S#3"
             element.save()
 
@@ -59,8 +59,7 @@ for element in down_flow_list:
             element.down_flow_trade = "S#4"
             element.save()
         # Version 2
-        if down_flow_confirm_list[4] is None and down_flow_confirm_list[3] == "UP" and down_flow_confirm_list[
-            2] is None:
+        if down_flow_confirm_list[4] is None and down_flow_confirm_list[3] == "UP" and down_flow_confirm_list[2] is None:
             down_flow_element_list[3].down_flow_trade = "S#2"
             down_flow_element_list[3].save()
         # Version 1
@@ -68,6 +67,6 @@ for element in down_flow_list:
             down_flow_element_list[3].down_flow_trade = "B#1"
             down_flow_element_list[3].save()
         # Version 3
-        if down_flow_up_down_list[3] == "DN" and down_flow_up_down_list[4] == "DN":
+        if down_flow_up_down_list[3] == "DN" and down_flow_up_down_list[4] == "DN" and down_flow_confirm_list[4] != "DN":
             element.down_flow_trade = "B#3"
             element.save()
