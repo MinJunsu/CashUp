@@ -161,11 +161,16 @@ for num_count in range(len(req)):
                 if element == "D":
                     count += 1
                     max_price_list.append(dn_list[idx])
-                    min_price_list.append(up_list[idx])
                 else:
                     is_U = True
                 if is_U and count >= 3:
-                    break
+                    if element == "U":
+                        break
+                    else:
+                        min_price_list.append(up_list[idx])
+                        break
+                min_price_list.append(up_list[idx])
+
             if prev_up_down == "D" and max(max_price_list) == max_price_list[len(max_price_list) - 1]:
                 if prev_signal_down_price != 0:
                     if prev_signal_down_price < min(min_price_list):
@@ -192,12 +197,16 @@ for num_count in range(len(req)):
                 if element == "U":
                     count += 1
                     min_price_list.append(up_list[idx])
-                    max_price_list.append(dn_list[idx])
                 else:
                     is_D = True
 
                 if is_D and count >= 3:
-                    break
+                    if element == "D":
+                        break
+                    else:
+                        max_price_list.append(dn_list[idx])
+                        break
+                max_price_list.append(dn_list[idx])
 
             if prev_up_down == "U" and min(min_price_list) == min_price_list[len(min_price_list) - 1]:
                 print(datetime)
@@ -440,7 +449,7 @@ for num_count in range(len(req)):
                 }
                 DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
 
-    if num_count > 990:
+    if num_count > 0:
         default = {
             'datetime': datetime,
             'open_price': open_price,
