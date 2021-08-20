@@ -117,16 +117,50 @@ class AutoTrade:
             self.version_3_short_flag = True
 
     def version_4_is_buy(self):
-        up_flow = UpFlow.objects.filter(up_flow_trade='S#3').last()
-        down_flow = DownFlow.objects.filter(down_flow_trade='B#3').last()
-        # Sell Order
-        if up_flow.datetime > down_flow.datetime:
-            self.version_4_short_flag = True
-            self.version_4_short_datetime = up_flow.datetime
-        # BuyOrder
-        else:
-            self.version_4_long_flag = True
-            self.version_4_long_datetime = down_flow.datetime
+        last_up_flow = UpFlow.objects.last()
+        last_down_flow = DownFlow.objects.last()
+        if last_up_flow.up_flow_confirm == "UP":
+            if last_up_flow.up_flow_trade == "B#4":
+                self.version_4_short_flag = True
+                self.version_4_short_datetime = last_up_flow.datetime
+
+            else:
+                prev_up_flow_list = UpFlow.objects.order_by('-id').all()[:4]
+                flag = False
+                for element in prev_up_flow_list:
+                    if element.up_flow_confirm != "UP":
+                        flag = True
+
+                if not flag:
+                    self.version_4_long_flag = True
+                    self.version_4_long_datetime = last_up_flow.datetime
+
+        elif last_up_flow.up_flow_confirm is None:
+            tmp_up_flow = UpFlow.objects.exclude(id=last_up_flow.id).filter(up_flow_confirm=None).last()
+            if 1 <= UpFlow.objects.filter(id__range=[tmp_up_flow.id, last_up_flow.id], up_flow_confirm='UP').count() <= 2:
+                self.version_4_short_flag = True
+                self.version_4_short_datetime = last_up_flow.datetime
+
+        if last_down_flow.down_flow_confirm == "DN":
+            if last_down_flow.down_flow_trade == "S#4":
+                self.version_4_long_flag = True
+                self.version_4_long_datetime = last_down_flow.datetime
+
+            else:
+                prev_down_flow_list = DownFlow.objects.order_by('-id').all()[:4]
+                flag = False
+                for element in prev_down_flow_list:
+                    if element.down_flow_confirm != "DN":
+                        flag = True
+                if not flag:
+                    self.version_4_short_flag = True
+                    self.version_4_short_datetime = last_down_flow.datetime
+
+        elif last_down_flow.down_flow_confirm is None:
+            tmp_down_flow = DownFlow.objects.exclude(id=last_down_flow.id).filter(down_flow_confirm=None).last()
+            if 1 <= DownFlow.objects.filter(id__range=[tmp_down_flow.id, last_down_flow.id], down_flow_confirm='DN').count() <= 2:
+                self.version_4_long_flag = True
+                self.version_4_long_datetime = last_down_flow.datetime
 
     def get_order_price(self, is_buy, rate_option):
         if is_buy:
