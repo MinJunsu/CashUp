@@ -120,20 +120,20 @@ class AutoTrade:
         last_up_flow = UpFlow.objects.last()
         last_down_flow = DownFlow.objects.last()
         if last_up_flow.up_flow_confirm == "UP":
-            if last_up_flow.up_flow_trade == "B#4":
-                self.version_4_short_flag = True
-                self.version_4_short_datetime = last_up_flow.datetime
+            prev_up_flow_list = UpFlow.objects.order_by('-id').all()[:4]
+            flag = False
+            for element in prev_up_flow_list:
+                if element.up_flow_confirm != "UP":
+                    flag = True
+                if element.up_flow_trade == "B#4":
+                    flag = True
+                    self.version_4_short_flag = True
+                    self.version_4_short_datetime = element.datetime
+                    break
 
-            else:
-                prev_up_flow_list = UpFlow.objects.order_by('-id').all()[:4]
-                flag = False
-                for element in prev_up_flow_list:
-                    if element.up_flow_confirm != "UP":
-                        flag = True
-
-                if not flag:
-                    self.version_4_long_flag = True
-                    self.version_4_long_datetime = last_up_flow.datetime
+            if not flag:
+                self.version_4_long_flag = True
+                self.version_4_long_datetime = last_up_flow.datetime
 
         elif last_up_flow.up_flow_confirm is None:
             tmp_up_flow = UpFlow.objects.exclude(id=last_up_flow.id).filter(up_flow_confirm=None).last()
@@ -142,25 +142,44 @@ class AutoTrade:
                 self.version_4_short_datetime = last_up_flow.datetime
 
         if last_down_flow.down_flow_confirm == "DN":
-            if last_down_flow.down_flow_trade == "S#4":
-                self.version_4_long_flag = True
-                self.version_4_long_datetime = last_down_flow.datetime
-
-            else:
-                prev_down_flow_list = DownFlow.objects.order_by('-id').all()[:4]
-                flag = False
-                for element in prev_down_flow_list:
-                    if element.down_flow_confirm != "DN":
-                        flag = True
-                if not flag:
-                    self.version_4_short_flag = True
-                    self.version_4_short_datetime = last_down_flow.datetime
+            prev_down_flow_list = DownFlow.objects.order_by('-id').all()[:4]
+            flag = False
+            for element in prev_down_flow_list:
+                if element.down_flow_confirm != "DN":
+                    flag = True
+                if element.down_flow_confirm == "S#4":
+                    flag = True
+                    self.version_4_long_flag = True
+                    self.version_4_long_datetime = element.datetime
+                    break
+            if not flag:
+                self.version_4_short_flag = True
+                self.version_4_short_datetime = last_down_flow.datetime
 
         elif last_down_flow.down_flow_confirm is None:
             tmp_down_flow = DownFlow.objects.exclude(id=last_down_flow.id).filter(down_flow_confirm=None).last()
             if 1 <= DownFlow.objects.filter(id__range=[tmp_down_flow.id, last_down_flow.id], down_flow_confirm='DN').count() <= 2:
                 self.version_4_long_flag = True
                 self.version_4_long_datetime = last_down_flow.datetime
+
+        work_query = HourData.objects.order_by('-id').exclude(work_two_1_0='')[:30]
+        for element in work_query:
+            if int(element.work_two_1_0[2:]) > 1:
+                last_work = element.work_two_1_0
+                break
+        if self.version_4_long_flag:
+            if last_work[1] == "D" and int(last_work[2:]) > 1:
+                pass
+            else:
+                self.version_4_long_flag = False
+                self.version_4_long_datetime = None
+
+        elif self.version_4_short_flag:
+            if last_work[1] == "U" and int(last_work[2:]) > 1:
+                pass
+            else:
+                self.version_4_short_flag = False
+                self.version_4_short_datetime = None
 
     def get_order_price(self, is_buy, rate_option):
         if is_buy:
@@ -388,9 +407,19 @@ class AutoTrade:
 
 
 if __name__ == "__main__":
-    trade_list = [AutoTrade(True), AutoTrade(False)]
-    for trade in trade_list:
-        trade.check_price()
-        if datetime.now().minute % 5 == 0:
-            trade.buy_order()
-            trade.sell_order()
+    # trade_list = [AutoTrade(True), AutoTrade(False)]
+    # for trade in trade_list:
+    #     trade.check_price()
+    #     if datetime.now().minute % 5 == 0:
+    #         trade.buy_order()
+    #         trade.sell_order()
+    while True:
+        print(datetime.now())
+        trade_list = [AutoTrade(True), AutoTrade(False)]
+        for trade in trade_list:
+            trade.check_price()
+            if datetime.now().minute % 5 == 0:
+                trade.buy_order()
+                trade.sell_order()
+        time.sleep(58.55)
+
