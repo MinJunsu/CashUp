@@ -407,19 +407,10 @@ class AutoTrade:
 
 
 if __name__ == "__main__":
-    # trade_list = [AutoTrade(True), AutoTrade(False)]
-    # for trade in trade_list:
-    #     trade.check_price()
-    #     if datetime.now().minute % 5 == 0:
-    #         trade.buy_order()
-    #         trade.sell_order()
-    while True:
-        print(datetime.now())
-        trade_list = [AutoTrade(True), AutoTrade(False)]
-        for trade in trade_list:
-            trade.check_price()
-            if datetime.now().minute % 5 == 0:
-                trade.buy_order()
-                trade.sell_order()
-        time.sleep(58.55)
+    trade_list = [AutoTrade(True), AutoTrade(False)]
+    for trade in trade_list:
+        trade.check_price()
+        if datetime.now().minute % 5 == 0:
+            trade.buy_order()
+            trade.sell_order()
 
