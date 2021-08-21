@@ -332,28 +332,30 @@ class AutoTrade:
                     element.save()
 
             buy_check_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_order_time=None),
-                                                         Q(buy_time=None)).last()
-            if buy_check_query:
+                                                         Q(buy_time=None))
+            if buy_check_query.last():
                 if self.flag:
-                    if buy_check_query.buy_price > self.min_price:
-                        print(f"version: {account['version']}, position: {self.flag} 매수 실행")
-                        buy_check_query.buy_time = datetime.now()
-                        buy_check_query.save()
+                    for element in buy_check_query:
+                        if element.buy_price > self.min_price:
+                            print(f"version: {account['version']}, position: {self.flag} 매수 실행")
+                            element.buy_time = datetime.now()
+                            element.save()
 
-                    elif datetime.now() - buy_check_query.buy_order_time > timedelta(hours=1):
-                        if account['version'] != 4:
-                            print(f"version: {account['version']}, position: {self.flag} 매수 주문 취소 실행")
-                            buy_check_query.delete()
+                        elif datetime.now() - element.buy_order_time > timedelta(hours=1):
+                            if account['version'] != 4:
+                                print(f"version: {account['version']}, position: {self.flag} 매수 주문 취소 실행")
+                                element.delete()
                 else:
-                    if buy_check_query.buy_price < self.max_price:
-                        print(f"version: {account['version']}, position: {self.flag} 매수 실행")
-                        buy_check_query.buy_time = datetime.now()
-                        buy_check_query.save()
+                    for element in buy_check_query:
+                        if element.buy_price < self.max_price:
+                            print(f"version: {account['version']}, position: {self.flag} 매수 실행")
+                            element.buy_time = datetime.now()
+                            element.save()
 
-                    elif datetime.now() - buy_check_query.buy_order_time > timedelta(hours=1):
-                        if account['version'] != 4:
-                            print(f"version: {account['version']}, position: {self.flag} 매수 주문 취소 실행")
-                            buy_check_query.delete()
+                        elif datetime.now() - element.buy_order_time > timedelta(hours=1):
+                            if account['version'] != 4:
+                                print(f"version: {account['version']}, position: {self.flag} 매수 주문 취소 실행")
+                                element.delete()
 
             sell_check_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(sell_order_time=None),
                                                           Q(sell_time=None))
