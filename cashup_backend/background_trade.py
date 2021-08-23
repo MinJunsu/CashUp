@@ -25,6 +25,8 @@ class AutoTrade:
         self.version_3_short_flag = False
         self.version_4_long_flag = False
         self.version_4_short_flag = False
+        self.version_5_long_flag = False
+        self.version_5_short_flag = False
         self.version_4_long_datetime = None
         self.version_4_short_datetime = None
         self.now_price = 0
@@ -37,7 +39,7 @@ class AutoTrade:
     def set_default(self):
         minute_data = MinuteData.objects.filter(
             datetime__range=[MinuteData.objects.last().datetime - timedelta(hours=6),
-                             MinuteData.objects.last().datetime])
+                             MinuteData.objects.last().datetime - timedelta(minutes=5)])
         self.now_price = minute_data.last().close_price
         self.min_price = minute_data.last().min_price
         self.max_price = minute_data.last().max_price
@@ -45,7 +47,8 @@ class AutoTrade:
         self.version_2_is_buy(minute_data)
         self.version_3_is_buy(minute_data)
         self.version_4_is_buy()
-        print(f'version2: ({self.version_2_long_flag}, {self.version_2_short_flag}) , version3: ({self.version_3_long_flag}, {self.version_3_short_flag}), version4: ({self.version_4_long_flag}, {self.version_4_short_flag})')
+        self.version_5_is_buy(minute_data)
+        print(f'version2: ({self.version_2_long_flag}, {self.version_2_short_flag}) , version3: ({self.version_3_long_flag}, {self.version_3_short_flag}), version4: ({self.version_4_long_flag}, {self.version_4_short_flag}), version5: ({self.version_5_long_flag}, {self.version_5_short_flag})')
 
     def get_accounts(self):
         user_query = TradeSetting.objects.all()
@@ -181,6 +184,30 @@ class AutoTrade:
                 self.version_4_short_flag = False
                 self.version_4_short_datetime = None
 
+    def version_5_is_buy(self, data):
+        last_data = data.last()
+        if last_data.signal == "fU(D)":
+            last_fu_time = MinuteData.objects.filter(signal="fU(U)").last().datetime
+            if last_data.datetime - last_fu_time > timedelta(minutes=45):
+                prev_query = MinuteData.objects.filter(datetime__range=[last_fu_time, last_data.datetime])
+                flag = True
+                for element in prev_query:
+                    if element.signal == "fD(D)":
+                        flag = False
+                if flag:
+                    self.version_5_long_flag = True
+
+        if last_data.signal == "fD(U)":
+            last_fd_time = MinuteData.objects.filter(signal="fD(D)").last().datetime
+            if last_data.datetime - last_fd_time > timedelta(minutes=45):
+                prev_query = MinuteData.objects.filter(datetime__range=[last_fd_time, last_data.datetime])
+                flag = True
+                for element in prev_query:
+                    if element.signal == "fU(U)":
+                        flag = False
+                if flag:
+                    self.version_5_short_flag = True
+
     def get_order_price(self, is_buy, rate_option):
         if is_buy:
             if self.flag:
@@ -217,6 +244,9 @@ class AutoTrade:
                 elif account['version'] == 4:
                     if self.version_4_long_flag:
                         buy_flag = True
+                elif account['version'] == 5:
+                    if self.version_5_long_flag:
+                        buy_flag = True
             else:
                 if account['version'] == 1:
                     if self.version_1_short_flag:
@@ -229,6 +259,9 @@ class AutoTrade:
                         buy_flag = True
                 elif account['version'] == 4:
                     if self.version_4_short_flag:
+                        buy_flag = True
+                elif account['version'] == 5:
+                    if self.version_5_short_flag:
                         buy_flag = True
 
             if buy_flag:
