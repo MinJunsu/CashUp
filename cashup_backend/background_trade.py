@@ -386,7 +386,7 @@ class AutoTrade:
                                     buy_price=self.get_order_price(True, account['buy_rate_option'])
                                 )
                         else:
-                            if self.now_price * (1 + (account['buy_rate_option'] / 10000)) < prev_price:
+                            if self.now_price * (1 + (account['buy_rate_option'] / 10000)) > prev_price:
                                 TradeResult.objects.create(
                                     position=self.flag,
                                     user=account['user'],
