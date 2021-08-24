@@ -108,6 +108,7 @@ class AutoTrade:
                 for element in prev_query:
                     if min_price >= element.min_price:
                         self.version_1_short_flag = True
+                        break
 
         if last_data.signal == "fD(U)":
             last_fdu_time = last_data.datetime
@@ -143,6 +144,7 @@ class AutoTrade:
                 for element in prev_query:
                     if max_price <= element.max_price:
                         self.version_1_long_flag = True
+                        break
 
     def version_2_is_buy(self, data):
         last_signal = ""
