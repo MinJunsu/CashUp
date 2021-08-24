@@ -410,7 +410,7 @@ class AutoTrade:
                                     user=account['user'],
                                     version=account['version'],
                                     buy_order_time=datetime.now(),
-                                    amount=prev_amount,
+                                    amount=prev_amount_sum,
                                     buy_price=self.get_order_price(True, account['buy_rate_option'])
                                 )
                         else:
@@ -420,7 +420,7 @@ class AutoTrade:
                                     user=account['user'],
                                     version=account['version'],
                                     buy_order_time=datetime.now(),
-                                    amount=prev_amount,
+                                    amount=prev_amount_sum,
                                     buy_price=self.get_order_price(True, account['buy_rate_option'])
                                 )
 
