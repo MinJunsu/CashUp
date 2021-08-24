@@ -19,6 +19,8 @@ class AutoTrade:
         self.flag = flag
         self.version_1_long_flag = False
         self.version_1_short_flag = False
+        self.version_1_long_datetime = None
+        self.version_1_short_datetime = None
         self.version_2_long_flag = False
         self.version_2_short_flag = False
         self.version_3_long_flag = False
@@ -48,7 +50,7 @@ class AutoTrade:
         self.version_3_is_buy(minute_data)
         self.version_4_is_buy()
         self.version_5_is_buy(minute_data)
-        print(f'version2: ({self.version_2_long_flag}, {self.version_2_short_flag}) , version3: ({self.version_3_long_flag}, {self.version_3_short_flag}), version4: ({self.version_4_long_flag}, {self.version_4_short_flag}), version5: ({self.version_5_long_flag}, {self.version_5_short_flag})')
+        print(f'version1: ({self.version_1_long_flag}, {self.version_1_short_flag}) version2: ({self.version_2_long_flag}, {self.version_2_short_flag}) , version3: ({self.version_3_long_flag}, {self.version_3_short_flag}), version4: ({self.version_4_long_flag}, {self.version_4_short_flag}), version5: ({self.version_5_long_flag}, {self.version_5_short_flag})')
 
     def get_accounts(self):
         user_query = TradeSetting.objects.all()
@@ -67,6 +69,55 @@ class AutoTrade:
                     'buy_rate_option': element.buy_rate_option,
                     'sell_rate_option': element.sell_rate_option
                 })
+
+    def version_1_is_buy(self):
+        last_fud_time = MinuteData.objects.filter(signal="fU(D)").last().datetime
+        last_fuu_time = MinuteData.objects.filter(signal="fU(U)").last().datetime
+        if last_fuu_time < last_fud_time:
+            prev_query = MinuteData.objects.filter(datetime__range=[last_fuu_time, last_fud_time])
+            min_price = 0
+            for element in prev_query:
+                if element.signal == "fD(D)":
+                    min_list = [element.min_price, MinuteData.objects.filter(datetime=element.datetime - timedelta(minutes=5)).last().min_price]
+                    min_price = min(min_list)
+        prev_query = MinuteData.objects.filter(datetime__gt=last_fud_time)
+        prev_continue_up_down = ""
+        for element in prev_query:
+            if min_price == 0:
+                if prev_continue_up_down[0] == "U" and int(prev_continue_up_down[1:]) > 1 and element.up_down == "D":
+                    self.version_1_short_flag = True
+                    self.version_1_short_datetime = element.datetime
+            else:
+                if min_price >= element.min_price:
+                    if prev_continue_up_down[0] == "U" and int(prev_continue_up_down[1:]) > 1 and element.up_down == "D":
+                        self.version_1_short_flag = True
+                        self.version_1_short_datetime = element.datetime
+            prev_continue_up_down = element.continue_up_down
+
+        last_fdu_time = MinuteData.objects.filter(signal="fU(D)").last().datetime
+        last_fdd_time = MinuteData.objects.filter(signal="fU(U)").last().datetime
+        if last_fdd_time < last_fdu_time:
+            prev_query = MinuteData.objects.filter(datetime__range=[last_fdd_time, last_fdu_time])
+            max_price = 0
+            for element in prev_query:
+                if element.signal == "fU(U)":
+                    max_list = [element.max_price, MinuteData.objects.filter(
+                        datetime=element.datetime - timedelta(minutes=5)).last().max_price]
+                    max_price = max(max_list)
+        prev_query = MinuteData.objects.filter(datetime__gt=last_fdu_time)
+        prev_continue_up_down = ""
+        for element in prev_query:
+            if max_price == 0:
+                if prev_continue_up_down[0] == "D" and int(prev_continue_up_down[1:]) > 1 and element.up_down == "U":
+                    self.version_1_long_flag = True
+                    self.version_1_long_datetime = element.datetime
+            else:
+                if max_price <= element.max_price:
+                    if prev_continue_up_down[0] == "D" and int(
+                            prev_continue_up_down[1:]) > 1 and element.up_down == "U":
+                        self.version_1_long_flag = True
+                        self.version_1_long_datetime = element.datetime
+            prev_continue_up_down = element.continue_up_down
 
     def version_2_is_buy(self, data):
         last_signal = ""
@@ -265,50 +316,39 @@ class AutoTrade:
                         buy_flag = True
 
             if buy_flag:
-                if account['version'] == 4:
+                if account['version'] == 1:
                     if self.flag:
-                        if self.version_4_long_flag:
-                            if not TradeResult.objects.filter(signal_time=self.version_4_long_datetime):
-                                print(f"version: {account['version']}, position: {self.flag} 매수 주문 실행")
-                                query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), Q(buy_time=None))
-                                for element in query:
-                                    element.delete()
-                                order_list = []
-                                for rate in [20, 40, 60, 80, 100]:
-                                    order_list.append(
-                                        TradeResult(
-                                            position=self.flag,
-                                            signal_time=self.version_4_long_datetime,
-                                            user=account['user'],
-                                            version=account['version'],
-                                            buy_order_time=datetime.now(),
-                                            amount=100,
-                                            buy_price=self.get_order_price(True, rate)
-                                        )
+                        if not TradeResult.objects.filter(signal_time=self.version_1_long_datetime):
+                            order_list = []
+                            for rate in [10, 20, 30, 40, 50]:
+                                order_list.append(
+                                    TradeResult(
+                                        position=self.flag,
+                                        signal_time=self.version_1_long_datetime,
+                                        user=account['user'],
+                                        version=account['version'],
+                                        buy_order_time=datetime.now(),
+                                        amount=100,
+                                        buy_price=self.get_order_price(True, rate)
                                     )
-                                TradeResult.objects.bulk_create(order_list)
+                                )
+                            TradeResult.objects.bulk_create(order_list)
                     else:
-                        if self.version_4_short_flag:
-                            print(TradeResult.objects.filter(signal_time=self.version_4_short_datetime))
-                            if not TradeResult.objects.filter(signal_time=self.version_4_short_datetime):
-                                print(f"version: {account['version']}, position: {self.flag} 매수 주문 실행")
-                                query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), Q(buy_time=None))
-                                for element in query:
-                                    element.delete()
-                                order_list = []
-                                for rate in [20, 40, 60, 80, 100]:
-                                    order_list.append(
-                                        TradeResult(
-                                            position=self.flag,
-                                            signal_time=self.version_4_short_datetime,
-                                            user=account['user'],
-                                            version=account['version'],
-                                            buy_order_time=datetime.now(),
-                                            amount=100,
-                                            buy_price=self.get_order_price(True, rate)
-                                        )
+                        if not TradeResult.objects.filter(signal_time=self.version_1_short_datetime):
+                            order_list = []
+                            for rate in [10, 20, 30, 40, 50]:
+                                order_list.append(
+                                    TradeResult(
+                                        position=self.flag,
+                                        signal_time=self.version_1_short_datetime,
+                                        user=account['user'],
+                                        version=account['version'],
+                                        buy_order_time=datetime.now(),
+                                        amount=100,
+                                        buy_price=self.get_order_price(True, rate)
                                     )
-                                TradeResult.objects.bulk_create(order_list)
+                                )
+                            TradeResult.objects.bulk_create(order_list)
                 else:
                     if len(result_query) == 0:
                         print(f"version: {account['version']}, position: {self.flag} 매수 주문 실행")
@@ -418,27 +458,11 @@ class AutoTrade:
                     element.save()
 
             if earning_rate_sum > 0:
-                if account['version'] == 4:
-                    if self.flag:
-                        if self.version_4_short_flag:
-                            print(f"version: {account['version']}, position: {self.flag} 매도 주문 실행")
-                            for element in sell_query:
-                                element.sell_order_time = datetime.now()
-                                element.sell_price = self.get_order_price(False, account['sell_rate_option'])
-                                element.save()
-                    else:
-                        if self.version_4_long_flag:
-                            print(f"version: {account['version']}, position: {self.flag} 매도 주문 실행")
-                            for element in sell_query:
-                                element.sell_order_time = datetime.now()
-                                element.sell_price = self.get_order_price(False, account['sell_rate_option'])
-                                element.save()
-                else:
-                    print(f"version: {account['version']}, position: {self.flag} 매도 주문 실행")
-                    for element in sell_query:
-                        element.sell_order_time = datetime.now()
-                        element.sell_price = self.get_order_price(False, account['sell_rate_option'])
-                        element.save()
+                print(f"version: {account['version']}, position: {self.flag} 매도 주문 실행")
+                for element in sell_query:
+                    element.sell_order_time = datetime.now()
+                    element.sell_price = self.get_order_price(False, account['sell_rate_option'])
+                    element.save()
 
 
 if __name__ == "__main__":
