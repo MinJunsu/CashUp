@@ -301,7 +301,7 @@ class AutoTrade:
 
     def buy_order(self):
         for account in self.test_trade_users:
-            if account['version'] != 4:
+            if account['version'] != 1:
                 if TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), Q(buy_time=None), ~Q(buy_order_time=None)):
                     continue
             result_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None), Q(sell_order_time=None))
@@ -343,6 +343,10 @@ class AutoTrade:
                 if account['version'] == 1:
                     if self.flag:
                         if not TradeResult.objects.filter(signal_time=self.version_1_long_datetime):
+                            query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']),
+                                                               Q(buy_time=None))
+                            for element in query:
+                                element.delete()
                             order_list = []
                             for rate in [10, 20, 30, 40, 50]:
                                 order_list.append(
@@ -359,6 +363,10 @@ class AutoTrade:
                             TradeResult.objects.bulk_create(order_list)
                     else:
                         if not TradeResult.objects.filter(signal_time=self.version_1_short_datetime):
+                            query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']),
+                                                               Q(buy_time=None))
+                            for element in query:
+                                element.delete()
                             order_list = []
                             for rate in [10, 20, 30, 40, 50]:
                                 order_list.append(
