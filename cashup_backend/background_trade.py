@@ -395,8 +395,12 @@ class AutoTrade:
                                 buy_price=self.get_order_price(True, account['buy_rate_option'])
                             )
                     elif len(result_query) > 0:
-                        prev_trade = result_query.last()
-                        prev_amount, prev_price = prev_trade.amount, prev_trade.buy_price
+                        prev_trade = result_query
+                        prev_amount_sum = 0
+                        for idx, element in enumerate(prev_trade):
+                            prev_amount_sum += element.amount
+                            if idx == len(prev_trade) - 1:
+                                prev_price = element.buy_price
                         print(f"version: {account['version']}, position: {self.flag} 추가 매수 주문 실행")
 
                         if self.flag:
