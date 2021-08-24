@@ -101,12 +101,13 @@ class AutoTrade:
                     min_list = [element.min_price, MinuteData.objects.filter(
                         datetime=element.datetime - timedelta(minutes=5)).last().min_price]
                     min_price = min(min_list)
+                    self.version_1_short_datetime = element.datetime
+
             prev_query = MinuteData.objects.filter(datetime__gt=last_fud_time)
             if min_price != 0:
                 for element in prev_query:
                     if min_price >= element.min_price:
                         self.version_1_short_flag = True
-                        self.version_1_short_datetime = element.datetime
 
         if last_data.signal == "fD(U)":
             last_fdu_time = last_data.datetime
@@ -136,12 +137,12 @@ class AutoTrade:
                     max_list = [element.max_price, MinuteData.objects.filter(
                         datetime=element.datetime - timedelta(minutes=5)).last().max_price]
                     max_price = max(max_list)
+                    self.version_1_long_datetime = element.datetime
             prev_query = MinuteData.objects.filter(datetime__gt=last_fdu_time)
             if max_price != 0:
                 for element in prev_query:
                     if max_price <= element.max_price:
                         self.version_1_long_flag = True
-                        self.version_1_long_datetime = element.datetime
 
     def version_2_is_buy(self, data):
         last_signal = ""
