@@ -436,16 +436,16 @@ for num_count in range(len(req)):
                 default = {
                     'datetime': flow_element.datetime,
                     'base_price': flow_element.base_price,
-                    'up_flow': flow_element.flow,
-                    'up_flow_confirm': flow_element.flow_confirm
+                    'flow': flow_element.flow,
+                    'flow_confirm': flow_element.flow_confirm
                 }
                 UpFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
             else:
                 default = {
                     'datetime': flow_element.datetime,
                     'base_price': flow_element.base_price,
-                    'down_flow': flow_element.flow,
-                    'down_flow_confirm': flow_element.flow_confirm
+                    'flow': flow_element.flow,
+                    'flow_confirm': flow_element.flow_confirm
                 }
                 DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
 
