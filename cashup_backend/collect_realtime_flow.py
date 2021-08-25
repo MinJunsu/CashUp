@@ -24,7 +24,7 @@ for element in up_flow_list:
         up_flow_confirm_list.pop(0)
         up_flow_element_list.pop(0)
     up_flow_up_down_list.append(element.flow)
-    up_flow_confirm_list.append(element.low_confirm)
+    up_flow_confirm_list.append(element.flow_confirm)
     up_flow_element_list.append(element)
 
     if len(up_flow_up_down_list) > 4:
