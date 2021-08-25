@@ -52,14 +52,14 @@ class MinuteData(models.Model):
 class UpFlow(models.Model):
     datetime = models.DateTimeField(verbose_name='시간')
     base_price = models.FloatField(verbose_name='기준 가격')
-    up_flow = models.CharField(max_length=2, verbose_name='상승 흐름', null=True)
-    up_flow_confirm = models.CharField(max_length=2, verbose_name='상승 흐름 확인', null=True)
-    up_flow_trade = models.CharField(max_length=5, verbose_name='상승 흐름 거래', null=True)
+    flow = models.CharField(max_length=2, verbose_name='상승 흐름', null=True)
+    flow_confirm = models.CharField(max_length=2, verbose_name='상승 흐름 확인', null=True)
+    flow_trade = models.CharField(max_length=5, verbose_name='상승 흐름 거래', null=True)
 
 
 class DownFlow(models.Model):
     datetime = models.DateTimeField(verbose_name='시간')
     base_price = models.FloatField(verbose_name='기준 가격')
-    down_flow = models.CharField(max_length=2, verbose_name='하락 흐름', null=True)
-    down_flow_confirm = models.CharField(max_length=2, verbose_name='하락 흐름 확인', null=True)
-    down_flow_trade = models.CharField(max_length=5, verbose_name='하락 흐름 거래', null=True)
+    flow = models.CharField(max_length=2, verbose_name='하락 흐름', null=True)
+    flow_confirm = models.CharField(max_length=2, verbose_name='하락 흐름 확인', null=True)
+    flow_trade = models.CharField(max_length=5, verbose_name='하락 흐름 거래', null=True)
