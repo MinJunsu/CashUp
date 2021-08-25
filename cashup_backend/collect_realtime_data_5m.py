@@ -391,19 +391,19 @@ for num_count in range(len(req)):
             flow_element.datetime = flow_element_list[1]['datetime']
             flow_element.base_price = flow_element_list[1]['max_price']
             if prev_down_flow < flow_element_list[1]['max_price']:
-                flow_element.down_flow = "UP"
+                flow_element.flow = "UP"
             else:
-                flow_element.down_flow = "DN"
+                flow_element.flow = "DN"
             if len(down_flow_list) > 4:
                 down_flow_list.pop(0)
-            down_flow_list.append(flow_element.down_flow)
+            down_flow_list.append(flow_element.flow)
 
             if len(down_flow_list) > 4:
                 if down_flow_list.count("UP") > 3:
-                    flow_element.down_flow_confirm = "UP"
+                    flow_element.flow_confirm = "UP"
 
                 if down_flow_list.count("DN") > 3:
-                    flow_element.down_flow_confirm = "DN"
+                    flow_element.flow_confirm = "DN"
 
         prev_down_flow = flow_element_list[1]['max_price']
 
@@ -413,20 +413,20 @@ for num_count in range(len(req)):
             flow_element.datetime = flow_element_list[1]['datetime']
             flow_element.base_price = flow_element_list[1]['min_price']
             if prev_up_flow < flow_element_list[1]['min_price']:
-                flow_element.up_flow = "UP"
+                flow_element.flow = "UP"
             else:
-                flow_element.up_flow = "DN"
+                flow_element.flow = "DN"
 
             if len(up_flow_list) > 4:
                 up_flow_list.pop(0)
-            up_flow_list.append(flow_element.up_flow)
+            up_flow_list.append(flow_element.flow)
 
             if len(up_flow_list) > 4:
                 if up_flow_list.count("UP") > 3:
-                    flow_element.up_flow_confirm = "UP"
+                    flow_element.flow_confirm = "UP"
 
                 if up_flow_list.count("DN") > 3:
-                    flow_element.up_flow_confirm = "DN"
+                    flow_element.flow_confirm = "DN"
 
         prev_up_flow = flow_element_list[1]['min_price']
 
@@ -436,16 +436,16 @@ for num_count in range(len(req)):
                 default = {
                     'datetime': flow_element.datetime,
                     'base_price': flow_element.base_price,
-                    'up_flow': flow_element.up_flow,
-                    'up_flow_confirm': flow_element.up_flow_confirm
+                    'up_flow': flow_element.flow,
+                    'up_flow_confirm': flow_element.flow_confirm
                 }
                 UpFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
             else:
                 default = {
                     'datetime': flow_element.datetime,
                     'base_price': flow_element.base_price,
-                    'down_flow': flow_element.down_flow,
-                    'down_flow_confirm': flow_element.down_flow_confirm
+                    'down_flow': flow_element.flow,
+                    'down_flow_confirm': flow_element.flow_confirm
                 }
                 DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
 
