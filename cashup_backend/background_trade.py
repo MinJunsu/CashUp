@@ -49,7 +49,7 @@ class AutoTrade:
         self.version_1_is_buy(minute_data)
         self.version_2_is_buy(minute_data)
         self.version_3_is_buy(minute_data)
-        self.version_4_is_buy()
+        # self.version_4_is_buy()
         self.version_5_is_buy(minute_data)
         print(f'version1: ({self.version_1_long_flag}, {self.version_1_short_flag}) version2: ({self.version_2_long_flag}, {self.version_2_short_flag}) , version3: ({self.version_3_long_flag}, {self.version_3_short_flag}), version4: ({self.version_4_long_flag}, {self.version_4_short_flag}), version5: ({self.version_5_long_flag}, {self.version_5_short_flag})')
 

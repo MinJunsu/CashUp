@@ -16,9 +16,9 @@ class MinuteDataAdmin(admin.ModelAdmin):
 
 @admin.register(UpFlow)
 class UpFlowAdmin(admin.ModelAdmin):
-    list_display = ['datetime', 'base_price', 'up_flow', 'up_flow_confirm', 'up_flow_trade']
+    list_display = ['datetime', 'base_price', 'flow', 'flow_confirm', 'flow_trade']
 
 
 @admin.register(DownFlow)
 class DownFlowAdmin(admin.ModelAdmin):
-    list_display = ['datetime', 'base_price', 'down_flow', 'down_flow_confirm', 'down_flow_trade']
+    list_display = ['datetime', 'base_price', 'flow', 'flow_confirm', 'flow_trade']
