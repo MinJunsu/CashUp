@@ -34,6 +34,7 @@ class TradeResult(models.Model):
                 self.earning_rate = round(-(((self.buy_price - now_price) / self.buy_price) * 100), 4) * 100
             else:
                 self.earning_rate = round(((now_price / self.buy_price) - 1) * 100, 4) * 100
+            self.earning_rate = self.earning_rate * (self.amount / 100)
             if self.earning_rate > self.max_rate:
                 self.max_rate = self.earning_rate
             if self.min_rate > self.earning_rate:
@@ -43,6 +44,7 @@ class TradeResult(models.Model):
                 self.earning_rate = round(((self.buy_price - now_price) / self.buy_price) * 100, 4) * 100
             else:
                 self.earning_rate = round(-((now_price / self.buy_price) - 1) * 100, 4) * 100
+            self.earning_rate = self.earning_rate * (self.amount / 100)
             if self.earning_rate > self.max_rate:
                 self.max_rate = self.earning_rate
             if self.min_rate > self.earning_rate:
