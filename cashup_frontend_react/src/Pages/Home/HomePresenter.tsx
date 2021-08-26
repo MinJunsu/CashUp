@@ -11,35 +11,35 @@ const Container = styled.div`
 `;
 
 const SummaryData = styled.div`
-    flex-basis: 30%;
+    flex: 3;
+    background-color: red;
 `;
 
 const DBData = styled.div`
-    flex-basis: 70%;
+    flex: 7;
     display: flex;
-    height: 450px;
+    min-height: 450px;
 `;
 
 interface IProps {
     loading: boolean,
+    isMinute: boolean,
+    setIsMinute: Function,
     upFlow: IFlow[] | null,
     downFlow: IFlow[] | null,
-    hourData: ICandleData[] | null,
-    minuteData: ICandleData[] | null,
+    elementData: ICandleData[] | null,
 }
 
-
-
-function HomePresenter({ loading, upFlow, downFlow, hourData, minuteData }: IProps) {
+function HomePresenter({ loading, isMinute, setIsMinute, upFlow, downFlow, elementData }: IProps) {
     return(
         <Container>
             <SummaryData>
-                
+                sadfasdfaåß
             </SummaryData>
             <DBData>
                 <Flow loading={loading} title="상승" flow={upFlow}/>
                 <Flow loading={loading} title="하락" flow={downFlow}/>
-                <CandleData loading={loading} hour={hourData} minute={minuteData} />
+                <CandleData loading={loading} isMinute={isMinute} setIsMinute={setIsMinute} elementData={elementData}/>
             </DBData>
         </Container>
     );

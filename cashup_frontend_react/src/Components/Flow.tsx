@@ -6,7 +6,7 @@ import { IFlow } from "Types/DBTypes";
 
 const Container = styled.div`
     text-align: center;
-    flex-basis: 20%;
+    flex: 1;
     border: 1px solid;
 `;
 
@@ -36,15 +36,12 @@ const Section = styled.section`
 
 const SectionHeader = styled.div`
     font-size: 15px;
-    display: grid;
-    gap: 2px;
-    grid-template-columns: 4fr 1fr 1fr 1fr 1fr;  
+    display: flex;
 `;
-const SectionHeaderElement = styled.h5`
+const SectionHeaderElement = styled.h5<{ basis: number }>`
     margin-top: 2px;
     margin-bottom: 2px;
-    padding-left: 5px;
-    padding-right: 5px;
+    flex: ${(props) => props.basis};
 `;
 const SectionBody = styled.div`
     font-size: 14px;
@@ -53,15 +50,13 @@ const SectionBody = styled.div`
 `;
 
 const SectionBodyContainer = styled.div`
-    display: grid;
-    gap: 2px;
-    grid-template-columns: 4fr 1fr 1fr 1fr 1fr;
+    display: flex;
     border-bottom: 1px solid;
 `;
 
-const SectionBodyElement = styled.span`
-    display: flex;
-    align-items: center;
+const SectionBodyElement = styled.span<{ basis: number }>`
+    flex: ${(props) => props.basis};
+    justify-content: center;
     padding-left: 1px;
     padding-right: 1px;
 `;
@@ -81,23 +76,22 @@ function Flow({ loading, title, flow }: IProps) {
                 <Frame>
                     <Section>
                         <SectionHeader>
-                            <SectionHeaderElement>시간</SectionHeaderElement>
-                            <SectionHeaderElement>가격</SectionHeaderElement>
-                            <SectionHeaderElement>흐름</SectionHeaderElement>
-                            <SectionHeaderElement>확인</SectionHeaderElement>
-                            <SectionHeaderElement>거래</SectionHeaderElement>
+                            <SectionHeaderElement basis={4}>시간</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>가격</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>흐름</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>확인</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>거래</SectionHeaderElement>
                         </SectionHeader>
                         <SectionBody>
                         {
                             flow?.map((element) => {
-                                console.log(element);
                                 return(
                                     <SectionBodyContainer>
-                                        <SectionBodyElement>{element.datetime.replace("T", " ").substring(0, 16)}</SectionBodyElement>
-                                        <SectionBodyElement>{element.base_price}</SectionBodyElement>
-                                        <SectionBodyElement>{element.flow}</SectionBodyElement>
-                                        <SectionBodyElement>{element.flow_confirm}</SectionBodyElement>
-                                        <SectionBodyElement>{element.flow_trade}</SectionBodyElement>
+                                        <SectionBodyElement basis={4}>{element.datetime.replace("T", " ").substring(0, 16)}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.base_price}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.flow}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.flow_confirm}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.flow_trade}</SectionBodyElement>
                                     </SectionBodyContainer>
                                 );
                             })

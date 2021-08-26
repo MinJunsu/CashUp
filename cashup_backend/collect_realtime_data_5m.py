@@ -156,18 +156,12 @@ for num_count in range(len(req)):
             count = 0
             max_price_list = []
             min_price_list = []
-            is_U = False
             for idx, element in enumerate(other_up_dn_list):
                 if element == "D":
                     count += 1
                     max_price_list.append(dn_list[idx])
                 else:
-                    is_U = True
-                if is_U and count >= 3:
-                    if element == "U":
-                        break
-                    else:
-                        min_price_list.append(up_list[idx])
+                    if count >= 3:
                         break
                 min_price_list.append(up_list[idx])
 
@@ -192,19 +186,12 @@ for num_count in range(len(req)):
             count = 0
             max_price_list = []
             min_price_list = []
-            is_D = False
             for idx, element in enumerate(other_up_dn_list):
                 if element == "U":
                     count += 1
                     min_price_list.append(up_list[idx])
                 else:
-                    is_D = True
-
-                if is_D and count >= 3:
-                    if element == "D":
-                        break
-                    else:
-                        max_price_list.append(dn_list[idx])
+                    if count >= 3:
                         break
                 max_price_list.append(dn_list[idx])
 
