@@ -160,7 +160,7 @@ for num_count in range(len(req)):
                 if element == "D":
                     count += 1
                     max_price_list.append(dn_list[idx])
-                else:
+                elif element == "U":
                     if count >= 3:
                         break
                 min_price_list.append(up_list[idx])
@@ -190,7 +190,7 @@ for num_count in range(len(req)):
                 if element == "U":
                     count += 1
                     min_price_list.append(up_list[idx])
-                else:
+                elif element == "D":
                     if count >= 3:
                         break
                 max_price_list.append(dn_list[idx])
