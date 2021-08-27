@@ -141,10 +141,10 @@ for num_count in range(len(req)):
             for idx, element in enumerate(other_up_dn_list):
                 if element == "D":
                     count += 1
-                    max_price_list.append(dn_list[idx])
                 elif element == "U":
                     if count >= 3:
                         break
+                max_price_list.append(dn_list[idx])
                 min_price_list.append(up_list[idx])
 
             if prev_up_down == "D" and max(max_price_list) == max_price_list[len(max_price_list) - 1]:
@@ -172,11 +172,11 @@ for num_count in range(len(req)):
             for idx, element in enumerate(other_up_dn_list):
                 if element == "U":
                     count += 1
-                    min_price_list.append(up_list[idx])
                 elif element == "D":
                     if count >= 3:
                         break
                 max_price_list.append(dn_list[idx])
+                min_price_list.append(up_list[idx])
 
             if prev_up_down == "U" and min(min_price_list) == min_price_list[len(min_price_list) - 1]:
                 print(datetime)
