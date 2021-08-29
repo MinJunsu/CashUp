@@ -72,12 +72,12 @@ class AutoTrade:
                 })
 
     def version_1_is_buy(self, data):
-        last_fdd = MinuteData.objects.filter(signal="fD(D)").last()
-        if datetime.now() - last_fdd.datetime >= timedelta(minutes=35):
-            now_up_down = MinuteData.objects.order_by('-id').all()[0]
-            before_up_down = MinuteData.objects.order_by('-id').all()[1]
+        last_fdd = data.filter(signal="fD(D)").last()
+        if data.last().datetime - last_fdd.datetime >= timedelta(minutes=35):
+            now_up_down = data.last()
+            before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "D" and now_up_down.up_down == "U":
-                range_query = MinuteData.objects.filter(datetime__range=[last_fdd.datetime + timedelta(minutes=5), datetime.now()])
+                range_query = MinuteData.objects.filter(datetime__range=[last_fdd.datetime + timedelta(minutes=5), data.last().datetime])
                 min_list = []
                 prev_up_down, prev_min_price = "", ""
                 for element in range_query:
@@ -88,12 +88,12 @@ class AutoTrade:
                 if max(min_list) == before_up_down.min_price:
                     self.version_1_long_flag = True
                     self.version_1_long_datetime = now_up_down.datetime
-        last_fuu = MinuteData.objects.filter(signal="fU(U)").last()
-        if datetime.now() - last_fuu.datetime >= timedelta(minutes=35):
-            now_up_down = MinuteData.objects.order_by('-id').all()[0]
-            before_up_down = MinuteData.objects.order_by('-id').all()[1]
+        last_fuu = data.filter(signal="fU(U)").last()
+        if data.last().datetime - last_fuu.datetime >= timedelta(minutes=35):
+            now_up_down = data.last()
+            before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "U" and now_up_down.up_down == "D":
-                range_query = MinuteData.objects.filter(datetime__range=[last_fuu.datetime + timedelta(minutes=5), datetime.now()])
+                range_query = MinuteData.objects.filter(datetime__range=[last_fuu.datetime + timedelta(minutes=5), data.last().datetime])
                 max_list = []
                 prev_up_down, prev_max_price = "", ""
                 for element in range_query:
