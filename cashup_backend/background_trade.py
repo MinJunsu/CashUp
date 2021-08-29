@@ -72,7 +72,7 @@ class AutoTrade:
                 })
 
     def version_1_is_buy(self, data):
-        last_fdd = MinuteData.objects.order_by('-id').filter(signal="fD(D)")
+        last_fdd = MinuteData.objects.filter(signal="fD(D)").last()
         if datetime.now() - last_fdd.datetime >= timedelta(minutes=35):
             now_up_down = MinuteData.objects.order_by('-id').all()[0]
             before_up_down = MinuteData.objects.order_by('-id').all()[1]
@@ -88,7 +88,7 @@ class AutoTrade:
                 if max(min_list) == before_up_down.min_price:
                     self.version_1_long_flag = True
                     self.version_1_long_datetime = now_up_down.datetime
-        last_fuu = MinuteData.objects.order_by('-id').filter(signal="fU(U)")
+        last_fuu = MinuteData.objects.filter(signal="fU(U)").last()
         if datetime.now() - last_fuu.datetime >= timedelta(minutes=35):
             now_up_down = MinuteData.objects.order_by('-id').all()[0]
             before_up_down = MinuteData.objects.order_by('-id').all()[1]
