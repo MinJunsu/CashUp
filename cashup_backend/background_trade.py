@@ -87,6 +87,7 @@ class AutoTrade:
                     prev_min_price = element.min_price
                 if max(min_list) == before_up_down.min_price:
                     self.version_1_long_flag = True
+                    self.version_1_long_datetime = now_up_down.datetime
         last_fuu = MinuteData.objects.order_by('-id').filter(signal="fU(U)")
         if datetime.now() - last_fuu.datetime >= timedelta(minutes=35):
             now_up_down = MinuteData.objects.order_by('-id').all()[0]
@@ -102,6 +103,7 @@ class AutoTrade:
                     prev_max_price = element.max_price
                 if min(max_list) == before_up_down.max_price:
                     self.version_1_short_flag = True
+                    self.version_1_short_datetime = now_up_down.datetime
         # last_data = data.last()
         # if last_data.signal == "fU(D)":
         #     last_fud_time = last_data.datetime
