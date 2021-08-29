@@ -2,7 +2,7 @@ import os
 import time
 
 import django
-from datetime import timedelta, datetime
+from datetime import date, timedelta, datetime
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'cashup_backend.settings'
 os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = "true"
@@ -72,79 +72,109 @@ class AutoTrade:
                 })
 
     def version_1_is_buy(self, data):
-        last_data = data.last()
-        if last_data.signal == "fU(D)":
-            last_fud_time = last_data.datetime
-            last_fuu_time = MinuteData.objects.filter(signal="fU(U)").last().datetime
-            prev_query = MinuteData.objects.filter(datetime__range=[last_fuu_time, last_fud_time])
-            min_price = 0
-            for element in prev_query:
-                if element.signal == "fD(D)":
-                    min_list = [element.min_price, MinuteData.objects.filter(
-                        datetime=element.datetime - timedelta(minutes=5)).last().min_price]
-                    min_price = min(min_list)
-            if min_price == 0:
-                self.version_1_short_flag = True
-                self.version_1_short_datetime = last_data.datetime
-
-            else:
-                if min_price >= last_data.min_price:
-                    self.version_1_short_flag = True
-                    self.version_1_short_datetime = last_data.datetime
-        else:
-            last_fud_time = MinuteData.objects.filter(signal="fU(D)").last().datetime
-            last_fuu_time = MinuteData.objects.filter(signal="fU(U)").last().datetime
-            prev_query = MinuteData.objects.filter(datetime__range=[last_fuu_time, last_fud_time])
-            min_price = 0
-            for element in prev_query:
-                if element.signal == "fD(D)":
-                    min_list = [element.min_price, MinuteData.objects.filter(
-                        datetime=element.datetime - timedelta(minutes=5)).last().min_price]
-                    min_price = min(min_list)
-                    self.version_1_short_datetime = element.datetime
-
-            prev_query = MinuteData.objects.filter(datetime__gt=last_fud_time)
-            if min_price != 0:
-                for element in prev_query:
-                    if min_price >= element.min_price:
-                        self.version_1_short_flag = True
-                        break
-
-        if last_data.signal == "fD(U)":
-            last_fdu_time = last_data.datetime
-            last_fdd_time = MinuteData.objects.filter(signal="fD(D)").last().datetime
-            prev_query = MinuteData.objects.filter(datetime__gt=[last_fdd_time, last_fdu_time])
-            max_price = 0
-            for element in prev_query:
-                if element.signal == "fU(U)":
-                    max_list = [element.max_price, MinuteData.objects.filter(
-                        datetime=element.datetime - timedelta(minutes=5)).last().max_price]
-                    max_price = min(max_list)
-            if max_price == 0:
-                self.version_1_long_flag = True
-                self.version_1_long_datetime = last_data.datetime
-
-            else:
-                if max_price <= last_data.max_price:
+        last_fdd = MinuteData.objects.order_by('-id').filter(signal="fD(D)")
+        if datetime.now() - last_fdd.datetime >= timedelta(minutes=35):
+            now_up_down = MinuteData.objects.order_by('-id').all()[0]
+            before_up_down = MinuteData.objects.order_by('-id').all()[1]
+            if before_up_down.up_down == "D" and now_up_down.up_down == "U":
+                range_query = MinuteData.objects.filter(datetime__range=[last_fdd.datetime + timedelta(minutes=5), datetime.now()])
+                min_list = []
+                prev_up_down, prev_min_price = "", ""
+                for element in range_query:
+                    if prev_up_down == "D" and element.up_down == "U":
+                        min_list.append(prev_min_price)
+                    prev_up_down = element.up_down
+                    prev_min_price = element.min_price
+                if max(min_list) == before_up_down.min_price:
                     self.version_1_long_flag = True
-                    self.version_1_long_datetime = last_data.datetime
-        else:
-            last_fdu_time = MinuteData.objects.filter(signal="fD(U)").last().datetime
-            last_fdd_time = MinuteData.objects.filter(signal="fD(D)").last().datetime
-            prev_query = MinuteData.objects.filter(datetime__range=[last_fdd_time, last_fdu_time])
-            max_price = 0
-            for element in prev_query:
-                if element.signal == "fU(U)":
-                    max_list = [element.max_price, MinuteData.objects.filter(
-                        datetime=element.datetime - timedelta(minutes=5)).last().max_price]
-                    max_price = max(max_list)
-                    self.version_1_long_datetime = element.datetime
-            prev_query = MinuteData.objects.filter(datetime__gt=last_fdu_time)
-            if max_price != 0:
-                for element in prev_query:
-                    if max_price <= element.max_price:
-                        self.version_1_long_flag = True
-                        break
+        last_fuu = MinuteData.objects.order_by('-id').filter(signal="fU(U)")
+        if datetime.now() - last_fuu.datetime >= timedelta(minutes=35):
+            now_up_down = MinuteData.objects.order_by('-id').all()[0]
+            before_up_down = MinuteData.objects.order_by('-id').all()[1]
+            if before_up_down.up_down == "U" and now_up_down.up_down == "D":
+                range_query = MinuteData.objects.filter(datetime__range=[last_fuu.datetime + timedelta(minutes=5), datetime.now()])
+                max_list = []
+                prev_up_down, prev_max_price = "", ""
+                for element in range_query:
+                    if prev_up_down == "U" and element.up_down == "D":
+                        max_list.append(prev_max_price)
+                    prev_up_down = element.up_down
+                    prev_max_price = element.max_price
+                if min(max_list) == before_up_down.max_price:
+                    self.version_1_short_flag = True
+        # last_data = data.last()
+        # if last_data.signal == "fU(D)":
+        #     last_fud_time = last_data.datetime
+        #     last_fuu_time = MinuteData.objects.filter(signal="fU(U)").last().datetime
+        #     prev_query = MinuteData.objects.filter(datetime__range=[last_fuu_time, last_fud_time])
+        #     min_price = 0
+        #     for element in prev_query:
+        #         if element.signal == "fD(D)":
+        #             min_list = [element.min_price, MinuteData.objects.filter(
+        #                 datetime=element.datetime - timedelta(minutes=5)).last().min_price]
+        #             min_price = min(min_list)
+        #     if min_price == 0:
+        #         self.version_1_short_flag = True
+        #         self.version_1_short_datetime = last_data.datetime
+
+        #     else:
+        #         if min_price >= last_data.min_price:
+        #             self.version_1_short_flag = True
+        #             self.version_1_short_datetime = last_data.datetime
+        # else:
+        #     last_fud_time = MinuteData.objects.filter(signal="fU(D)").last().datetime
+        #     last_fuu_time = MinuteData.objects.filter(signal="fU(U)").last().datetime
+        #     prev_query = MinuteData.objects.filter(datetime__range=[last_fuu_time, last_fud_time])
+        #     min_price = 0
+        #     for element in prev_query:
+        #         if element.signal == "fD(D)":
+        #             min_list = [element.min_price, MinuteData.objects.filter(
+        #                 datetime=element.datetime - timedelta(minutes=5)).last().min_price]
+        #             min_price = min(min_list)
+        #             self.version_1_short_datetime = element.datetime
+
+        #     prev_query = MinuteData.objects.filter(datetime__gt=last_fud_time)
+        #     if min_price != 0:
+        #         for element in prev_query:
+        #             if min_price >= element.min_price:
+        #                 self.version_1_short_flag = True
+        #                 break
+
+        # if last_data.signal == "fD(U)":
+        #     last_fdu_time = last_data.datetime
+        #     last_fdd_time = MinuteData.objects.filter(signal="fD(D)").last().datetime
+        #     prev_query = MinuteData.objects.filter(datetime__gt=[last_fdd_time, last_fdu_time])
+        #     max_price = 0
+        #     for element in prev_query:
+        #         if element.signal == "fU(U)":
+        #             max_list = [element.max_price, MinuteData.objects.filter(
+        #                 datetime=element.datetime - timedelta(minutes=5)).last().max_price]
+        #             max_price = min(max_list)
+        #     if max_price == 0:
+        #         self.version_1_long_flag = True
+        #         self.version_1_long_datetime = last_data.datetime
+
+        #     else:
+        #         if max_price <= last_data.max_price:
+        #             self.version_1_long_flag = True
+        #             self.version_1_long_datetime = last_data.datetime
+        # else:
+        #     last_fdu_time = MinuteData.objects.filter(signal="fD(U)").last().datetime
+        #     last_fdd_time = MinuteData.objects.filter(signal="fD(D)").last().datetime
+        #     prev_query = MinuteData.objects.filter(datetime__range=[last_fdd_time, last_fdu_time])
+        #     max_price = 0
+        #     for element in prev_query:
+        #         if element.signal == "fU(U)":
+        #             max_list = [element.max_price, MinuteData.objects.filter(
+        #                 datetime=element.datetime - timedelta(minutes=5)).last().max_price]
+        #             max_price = max(max_list)
+        #             self.version_1_long_datetime = element.datetime
+        #     prev_query = MinuteData.objects.filter(datetime__gt=last_fdu_time)
+        #     if max_price != 0:
+        #         for element in prev_query:
+        #             if max_price <= element.max_price:
+        #                 self.version_1_long_flag = True
+        #                 break
 
     def version_2_is_buy(self, data):
         last_signal = ""
