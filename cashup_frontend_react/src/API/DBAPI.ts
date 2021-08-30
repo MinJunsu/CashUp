@@ -3,7 +3,7 @@ import axios, { AxiosPromise } from "axios";
 import { IFlow, ICandle, IModifyFlag } from "Types/DBTypes";
 
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000"
+    baseURL: "http://121.147.38.28:8000"
 })
 
 export const DataRequest = {
