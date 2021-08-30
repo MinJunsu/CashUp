@@ -45,7 +45,7 @@ function Headers({ location: { pathname } }: IProps) {
             <List>
                 <Logo to='/'>CashUp</Logo>
                 <Element to='/status' current={pathname === "/status"}>내 정보</Element>
-                <Element to='/simulate' current={pathname === "/simulate"}>가상 거래 확인</Element>
+                <Element to='/test' current={pathname === "/test"}>가상 거래 확인</Element>
                 <Element to='/trade' current={pathname === "/trade"}>실전 거래 확인</Element>
             </List>
         </Container>

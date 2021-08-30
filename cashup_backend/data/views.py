@@ -2,34 +2,64 @@ from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 from django.core.serializers.json import DjangoJSONEncoder
 
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 import json
 
 from .models import HourData, MinuteData, UpFlow, DownFlow
 from .serializer import HourDataModelSerializer, MinuteDataModelSerializer, UpFlowModelSerializer, DownFlowModelSerializer
 
 # Create your views here.
-class DataAPIView(APIView):
+class HourAPIView(APIView):
     def get(self, request):
         term = int(request.GET.get('term', '14'))
         hour_query = HourData.objects.filter(datetime__gt=datetime.now() - timedelta(days=term)).order_by('-id')
-        minute_query = MinuteData.objects.filter(datetime__gt=datetime.now() - timedelta(days=term)).order_by('-id')
-        up_flow_query = UpFlow.objects.filter(datetime__gt=datetime.now() - timedelta(days=term)).order_by('-id')
-        down_flow_query = DownFlow.objects.filter(datetime__gt=datetime.now() - timedelta(days=term)).order_by('-id')
-        hour_serializer = HourDataModelSerializer(hour_query, many=True)
-        minute_serializer = MinuteDataModelSerializer(minute_query, many=True)
-        up_flow_serializer = UpFlowModelSerializer(up_flow_query, many=True)
-        down_flow_serializer = DownFlowModelSerializer(down_flow_query, many=True)
+        serializer = HourDataModelSerializer(hour_query, many=True)
         return Response({
-            "hour": hour_serializer.data,
-            "minute": minute_serializer.data,
-            "up_flow": up_flow_serializer.data,
-            "down_flow": down_flow_serializer.data
+            "candle": serializer.data
         })
 
+class MinuteAPIView(APIView):
+    def get(self, request):
+        term = int(request.GET.get('term', '14'))
+        minute_query = MinuteData.objects.filter(datetime__gt=datetime.now() - timedelta(days=term)).order_by('-id')
+        serializer = MinuteDataModelSerializer(minute_query, many=True)
+        return Response({
+            "candle": serializer.data
+        })
+
+class UpFlowAPIView(APIView):
+    def get(self, request):
+        term = int(request.GET.get('term', '14'))
+        upflow_query = UpFlow.objects.filter(datetime__gt=datetime.now() - timedelta(days=term)).order_by('-id')
+        serializer = UpFlowModelSerializer(upflow_query, many=True)
+        return Response({
+            "flow": serializer.data
+        })
+
+class DownFlowAPIView(APIView):
+    def get(self, request):
+        term = int(request.GET.get('term', '14'))
+        downflow_query = DownFlow.objects.filter(datetime__gt=datetime.now() - timedelta(days=term)).order_by('-id')
+        serializer = DownFlowModelSerializer(downflow_query, many=True)
+        return Response({
+            "flow": serializer.data
+        })
+
+class FlagAPIView(APIView):
+    def get(self, request):
+        hour_flag, minute_flag, upflow_flag, downflow_flag = True, True, False, False
+        if datetime.now() - UpFlow.objects.last().datetime < timedelta(minutes=5):
+            upflow_flag = True
+        if datetime.now() - DownFlow.objects.last().datetime < timedelta(minutes=5):
+            downflow_flag = True
+        return HttpResponse(json.dumps({
+            'hour_flag': hour_flag,
+            'minute_flag': minute_flag,
+            'upflow_flag': upflow_flag,
+            'downflow_flag': downflow_flag
+        }, cls=DjangoJSONEncoder))
 
 class ProgressbarAPIView(APIView):
     def get(self, request):

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 
-import { ICandleData } from "Types/DBTypes";
+import { ISateCandle } from "Types/DBTypes";
 
 const Container = styled.div`
     text-align: center;
@@ -62,6 +62,7 @@ const SectionBody = styled.div`
 const SectionBodyContainer = styled.div`
     display: flex;
     border-bottom: 1px solid;
+    cursor: default;
     :hover {
         background-color: skyblue;
     }
@@ -73,14 +74,13 @@ const SectionBodyElement = styled.span<{ basis: number }>`
 `;
 
 interface IProps {
-    loading: boolean,
     isMinute: boolean,
     setIsMinute: Function,
-    elementData: ICandleData[] | null,
+    elementData: ISateCandle
 }
 
 
-function CandleData({ loading, isMinute, setIsMinute, elementData }: IProps) {
+function CandleData({ isMinute, setIsMinute, elementData }: IProps) {
     return(
         <Container>
             <Header>
@@ -88,7 +88,7 @@ function CandleData({ loading, isMinute, setIsMinute, elementData }: IProps) {
                 <HeaderElement id="hour"   onClick={(event) => setIsMinute(false)} flag={!isMinute}><h4>1시간 데이터</h4></HeaderElement>
             </Header>
             {
-                loading ? <LoaderCotainer><Loader type="TailSpin" color="#a9eef5" height={100} width={100}/></LoaderCotainer> :
+                elementData.loading ? <LoaderCotainer><Loader type="TailSpin" color="#a9eef5" height={100} width={100}/></LoaderCotainer> :
                 <Frame>
                     <Section>
                         <SectionHeader>
@@ -107,9 +107,9 @@ function CandleData({ loading, isMinute, setIsMinute, elementData }: IProps) {
                         </SectionHeader>
                         <SectionBody>
                         {
-                            elementData?.map((element) => {
+                            elementData.data?.map((element) => {
                                 return(
-                                    <SectionBodyContainer>
+                                    <SectionBodyContainer key={element.datetime.replace("T", " ").substring(0, 16)} id={element.datetime.replace("T", " ").substring(0, 16)}>
                                         <SectionBodyElement basis={4}>{element.datetime.replace("T", " ").substring(0, 16)}</SectionBodyElement>
                                         <SectionBodyElement basis={1}>{element.open_price}</SectionBodyElement>
                                         <SectionBodyElement basis={1}>{element.max_price}</SectionBodyElement>

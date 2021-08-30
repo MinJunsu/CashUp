@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
 
-import { IFlow } from "Types/DBTypes";
+import { ISateFlow } from "Types/DBTypes";
 
 const Container = styled.div`
     text-align: center;
@@ -52,6 +52,10 @@ const SectionBody = styled.div`
 const SectionBodyContainer = styled.div`
     display: flex;
     border-bottom: 1px solid;
+    cursor: default;
+    :hover {
+        background-color: skyblue;
+    }
 `;
 
 const SectionBodyElement = styled.span<{ basis: number }>`
@@ -59,20 +63,21 @@ const SectionBodyElement = styled.span<{ basis: number }>`
     justify-content: center;
     padding-left: 1px;
     padding-right: 1px;
+    
 `;
 
 interface IProps {
-    loading: boolean,
     title: string,
-    flow: IFlow[] | null
+    flow: ISateFlow
 }
 
-function Flow({ loading, title, flow }: IProps) {
+function Flow({ title, flow }: IProps) {
+    console.log(flow);
     return(
         <Container>
             <Header>{title} 흐름 데이터</Header>
             {
-                loading ? <LoaderCotainer><Loader type="TailSpin" color="#a9eef5" height={100} width={100}/></LoaderCotainer>:
+                flow.loading ? <LoaderCotainer><Loader type="TailSpin" color="#a9eef5" height={100} width={100}/></LoaderCotainer>:
                 <Frame>
                     <Section>
                         <SectionHeader>
@@ -84,9 +89,9 @@ function Flow({ loading, title, flow }: IProps) {
                         </SectionHeader>
                         <SectionBody>
                         {
-                            flow?.map((element) => {
+                            flow.data.map((element) => {
                                 return(
-                                    <SectionBodyContainer>
+                                    <SectionBodyContainer key={element.datetime.replace("T", " ").substring(0, 16)} id={element.datetime.replace("T", " ").substring(0, 16)}>
                                         <SectionBodyElement basis={4}>{element.datetime.replace("T", " ").substring(0, 16)}</SectionBodyElement>
                                         <SectionBodyElement basis={1}>{element.base_price}</SectionBodyElement>
                                         <SectionBodyElement basis={1}>{element.flow}</SectionBodyElement>

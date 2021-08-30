@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import Flow from "Components/Flow";
-import { IFlow, ICandleData } from "Types/DBTypes";
+import { ISateFlow, ISateCandle } from "Types/DBTypes";
 import CandleData from "Components/CandleData";
 
 const Container = styled.div`
@@ -22,24 +22,23 @@ const DBData = styled.div`
 `;
 
 interface IProps {
-    loading: boolean,
     isMinute: boolean,
     setIsMinute: Function,
-    upFlow: IFlow[] | null,
-    downFlow: IFlow[] | null,
-    elementData: ICandleData[] | null,
+    upFlow: ISateFlow,
+    downFlow: ISateFlow,
+    elementData: ISateCandle,
 }
 
-function HomePresenter({ loading, isMinute, setIsMinute, upFlow, downFlow, elementData }: IProps) {
+function HomePresenter({ isMinute, setIsMinute, upFlow, downFlow, elementData }: IProps) {
     return(
         <Container>
             <SummaryData>
                 sadfasdfaåß
             </SummaryData>
             <DBData>
-                <Flow loading={loading} title="상승" flow={upFlow}/>
-                <Flow loading={loading} title="하락" flow={downFlow}/>
-                <CandleData loading={loading} isMinute={isMinute} setIsMinute={setIsMinute} elementData={elementData}/>
+                <Flow title="상승" flow={upFlow}/>
+                <Flow title="하락" flow={downFlow}/>
+                <CandleData isMinute={isMinute} setIsMinute={setIsMinute} elementData={elementData}/>
             </DBData>
         </Container>
     );

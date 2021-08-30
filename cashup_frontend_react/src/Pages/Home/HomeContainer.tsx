@@ -1,54 +1,71 @@
 import React, { useState, useEffect } from "react";
 
 import HomePresenter from "Pages/Home/HomePresenter";
-import { DataRequest } from "API";
-import { IFlow, ICandleData } from "Types/DBTypes";
+import { DataRequest } from "API/DBAPI";
+import { ISateFlow, ISateCandle } from "Types/DBTypes";
+import { RequestGetter } from "API/DBGetter";
+import { clearInterval } from "timers";
 
 interface IProps {
 
 }
 
 function HomeContainer({}: IProps) {
-    const [ loading, setLoading ] = useState<boolean>(true);
     const [ range, setRange ] = useState<number>(7);
-    const [ hourData, setHourData ] = useState<ICandleData[] | null>(null);
-    const [ minuteData, setMinuteDate ] = useState<ICandleData[] | null>(null);
-    const [ upFlow, setUpFlow ] = useState<IFlow[] | null>(null);
-    const [ downFlow, setDownFlow ] = useState<IFlow[] | null>(null);
+    const [ hourData, setHourData ] = useState<ISateCandle>({ loading: true, data: [] });
+    const [ minuteData, setMinuteDate ] = useState<ISateCandle>({ loading: true, data: [] });
+    const [ upFlow, setUpFlow ] = useState<ISateFlow>({ loading: true, data: [] });
+    const [ downFlow, setDownFlow ] = useState<ISateFlow>({ loading: true, data: [] });
     const [ isMinute, setIsMinute ] = useState<boolean>(true);
-    const [ elementData, setElementData ] = useState<ICandleData[] | null>(null);
+    const [ elementData, setElementData ] = useState<ISateCandle>({ loading: true, data: [] });
+
+    useEffect(() => {
+        RequestGetter.getHourData(setHourData);
+        RequestGetter.getMinuteData(setMinuteDate); 
+        RequestGetter.getUpFlowData(setUpFlow);
+        RequestGetter.getDownFlowData(setDownFlow);
+        const getFlag = setInterval(async () => { updateData(); }, 1000 * 60);
+        return () => clearInterval(getFlag);
+    }, [])
 
     useEffect(() => {
         if(isMinute) {
-            setElementData(minuteData);
+            setElementData({
+                loading: minuteData.loading,
+                data: minuteData.data
+            })
         } else {
-            setElementData(hourData);
+            setElementData({
+                loading: hourData.loading,
+                data: hourData.data
+            })
         }
-    }, [ isMinute ]);
+    }, [ isMinute ])
 
-    useEffect(() => {
-        getData();
-        setInterval(() => getData(), 60000);
-    }, [])
-
-    const getData = async() => {
-        try {
-            setLoading(true);
-            const { data: { hour, minute, up_flow, down_flow } } = await DataRequest.data(range);
-            setHourData(hour);
-            setMinuteDate(minute);
-            setUpFlow(up_flow);
-            setDownFlow(down_flow);
-            setElementData(isMinute ? minuteData : hourData);
-        } catch(e) {
-            console.log(e);
-        } finally {
-            setLoading(false);
+    const updateData = async () => {
+        const { data: { hour_flag, minute_flag, upflow_flag, downflow_flag } } = await DataRequest.flagData();
+        console.log(hour_flag, minute_flag, upflow_flag, downflow_flag);
+        const minute = new Date().getMinutes();
+        if(hour_flag) {
+            if(0 <= minute && minute <= 5) {
+                RequestGetter.getHourData(setHourData);
+            }
+        }
+        if (minute_flag) {
+            if(0 <= (minute % 5) && (minute % 5) <= 1)
+            RequestGetter.getMinuteData(setMinuteDate); 
+        }
+        if (upflow_flag) {
+            RequestGetter.getUpFlowData(setUpFlow);
+        }
+        if (downflow_flag) {
+            RequestGetter.getDownFlowData(setDownFlow);
         }
     }
+
     return(
         <div>
-            <HomePresenter loading={loading} upFlow={upFlow} downFlow={downFlow} isMinute={isMinute} setIsMinute={setIsMinute} elementData={elementData}/>
+            <HomePresenter upFlow={upFlow} downFlow={downFlow} isMinute={isMinute} setIsMinute={setIsMinute} elementData={elementData}/>
         </div>
     );
 }
