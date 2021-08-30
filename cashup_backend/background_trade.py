@@ -42,10 +42,10 @@ class AutoTrade:
         minute_data = MinuteData.objects.filter(
             datetime__range=[MinuteData.objects.last().datetime - timedelta(hours=6),
                              MinuteData.objects.last().datetime - timedelta(minutes=5)])
+        print(minute_data.last().datetime)
         self.now_price = minute_data.last().close_price
         self.min_price = minute_data.last().min_price
         self.max_price = minute_data.last().max_price
-        print(minute_data.last().datetime)
         self.get_accounts()
         self.version_1_is_buy(minute_data)
         self.version_2_is_buy(minute_data)
@@ -88,12 +88,12 @@ class AutoTrade:
                     if prev_up_down == "U" and element.up_down == "D":
                         max_list.append(prev_max_price)
                     prev_up_down = element.up_down
-                    prev_min_price = element.min_price
+                    prev_max_price = element.max_price
                 if flag and len(max_list) > 0:
                     if max(max_list) == before_up_down.max_price:
                         self.version_1_long_flag = True
                         self.version_1_long_datetime = last_fuu.datetime
-                    elif min(max_list) == before_up_down.min_price:
+                    elif min(max_list) == before_up_down.max_price:
                         self.version_1_short_flag = True
                         self.version_1_short_datetime = last_fuu.datetime
                     
