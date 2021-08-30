@@ -74,26 +74,30 @@ class AutoTrade:
 
     def version_1_is_buy(self, data):
         last_fdd = data.filter(signal="fD(D)").last()
-        if data.last().datetime - last_fdd.datetime >= timedelta(minutes=35):
+        if data.last().datetime - last_fdd.datetime >= timedelta(minutes=30):
             now_up_down = data.last()
             before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "D" and now_up_down.up_down == "U":
                 range_query = MinuteData.objects.filter(datetime__range=[last_fdd.datetime + timedelta(minutes=5), data.last().datetime])
                 max_list = []
                 prev_up_down, prev_max_price = "", ""
+                flag = True
                 for element in range_query:
+                    if element.signal == "fU(U)":
+                        flag = False
                     if prev_up_down == "D" and element.up_down == "U":
                         max_list.append(prev_max_price)
                     prev_up_down = element.up_down
                     prev_max_price = element.max_price
-                if max(max_list) == before_up_down.max_price:
-                    self.version_1_long_flag = True
-                    self.version_1_long_datetime = last_fdd.datetime
-                else:
-                    self.version_1_short_flag = True
-                    self.version_1_short_datetime = last_fdd.datetime
+                if flag:
+                    if max(max_list) == before_up_down.max_price:
+                        self.version_1_long_flag = True
+                        self.version_1_long_datetime = last_fdd.datetime
+                    else:
+                        self.version_1_short_flag = True
+                        self.version_1_short_datetime = last_fdd.datetime
         last_fuu = data.filter(signal="fU(U)").last()
-        if data.last().datetime - last_fuu.datetime >= timedelta(minutes=35):
+        if data.last().datetime - last_fuu.datetime >= timedelta(minutes=30):
             now_up_down = data.last()
             before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "U" and now_up_down.up_down == "D":
