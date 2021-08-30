@@ -78,32 +78,38 @@ class AutoTrade:
             before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "D" and now_up_down.up_down == "U":
                 range_query = MinuteData.objects.filter(datetime__range=[last_fdd.datetime + timedelta(minutes=5), data.last().datetime])
-                min_list = []
-                prev_up_down, prev_min_price = "", ""
+                max_list = []
+                prev_up_down, prev_max_price = "", ""
                 for element in range_query:
                     if prev_up_down == "D" and element.up_down == "U":
-                        min_list.append(prev_min_price)
+                        max_list.append(prev_max_price)
                     prev_up_down = element.up_down
-                    prev_min_price = element.min_price
-                if max(min_list) == before_up_down.min_price:
+                    prev_max_price = element.max_price
+                if max(max_list) == before_up_down.max_price:
                     self.version_1_long_flag = True
-                    self.version_1_long_datetime = now_up_down.datetime
+                    self.version_1_long_datetime = last_fdd.datetime
+                else:
+                    self.version_1_short_flag = True
+                    self.version_1_short_datetime = last_fdd.datetime
         last_fuu = data.filter(signal="fU(U)").last()
         if data.last().datetime - last_fuu.datetime >= timedelta(minutes=35):
             now_up_down = data.last()
             before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "U" and now_up_down.up_down == "D":
                 range_query = MinuteData.objects.filter(datetime__range=[last_fuu.datetime + timedelta(minutes=5), data.last().datetime])
-                max_list = []
-                prev_up_down, prev_max_price = "", ""
+                min_list = []
+                prev_up_down, prev_min_price = "", ""
                 for element in range_query:
                     if prev_up_down == "U" and element.up_down == "D":
-                        max_list.append(prev_max_price)
+                        max_list.append(prev_min_price)
                     prev_up_down = element.up_down
-                    prev_max_price = element.max_price
-                if min(max_list) == before_up_down.max_price:
+                    prev_min_price = element.min_price
+                if min(min_list) == before_up_down.min_price:
                     self.version_1_short_flag = True
-                    self.version_1_short_datetime = now_up_down.datetime
+                    self.version_1_short_datetime = last_fuu.datetime
+                else:
+                    self.version_1_long_flag = True
+                    self.version_1_long_datetime = last_fuu.datetime
         # last_data = data.last()
         # if last_data.signal == "fU(D)":
         #     last_fud_time = last_data.datetime
@@ -318,20 +324,20 @@ class AutoTrade:
                 if flag:
                     self.version_5_short_flag = True
 
-    def get_order_price(self, is_buy, rate_option):
+    def get_order_price(self, now_price, is_buy, rate_option):
         if is_buy:
             if self.flag:
-                price = self.now_price * (1 - (rate_option / 10000))
+                price = now_price * (1 - (rate_option / 10000))
                 return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
             else:
-                price = self.now_price * (1 + (rate_option / 10000))
+                price = now_price * (1 + (rate_option / 10000))
                 return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
         else:
             if self.flag:
-                price = self.now_price * (1 + (rate_option / 10000))
+                price = now_price * (1 + (rate_option / 10000))
                 return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
             else:
-                price = self.now_price * (1 - (rate_option / 10000))
+                price = now_price * (1 - (rate_option / 10000))
                 return int(price) + 0.5 if price - int(price) > 0.5 else int(price)
 
     def buy_order(self):
@@ -392,7 +398,7 @@ class AutoTrade:
                                         version=account['version'],
                                         buy_order_time=datetime.now(),
                                         amount=100,
-                                        buy_price=self.get_order_price(True, rate)
+                                        buy_price=self.get_order_price(self.min_price, True, rate)
                                     )
                                 )
                             TradeResult.objects.bulk_create(order_list)
@@ -412,7 +418,7 @@ class AutoTrade:
                                         version=account['version'],
                                         buy_order_time=datetime.now(),
                                         amount=100,
-                                        buy_price=self.get_order_price(True, rate)
+                                        buy_price=self.get_order_price(self.max_price, True, rate)
                                     )
                                 )
                             TradeResult.objects.bulk_create(order_list)
@@ -426,7 +432,7 @@ class AutoTrade:
                                 version=account['version'],
                                 buy_order_time=datetime.now(),
                                 amount=100,
-                                buy_price=self.get_order_price(True, account['buy_rate_option'])
+                                buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                             )
                         else:
                             TradeResult.objects.create(
@@ -435,7 +441,7 @@ class AutoTrade:
                                 version=account['version'],
                                 buy_order_time=datetime.now(),
                                 amount=100,
-                                buy_price=self.get_order_price(True, account['buy_rate_option'])
+                                buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                             )
                     elif len(result_query) > 0:
                         prev_trade = result_query
@@ -454,7 +460,7 @@ class AutoTrade:
                                     version=account['version'],
                                     buy_order_time=datetime.now(),
                                     amount=prev_amount_sum,
-                                    buy_price=self.get_order_price(True, account['buy_rate_option'])
+                                    buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                                 )
                         else:
                             if self.now_price * (1 + (account['buy_rate_option'] / 10000)) > prev_price:
@@ -464,7 +470,7 @@ class AutoTrade:
                                     version=account['version'],
                                     buy_order_time=datetime.now(),
                                     amount=prev_amount_sum,
-                                    buy_price=self.get_order_price(True, account['buy_rate_option'])
+                                    buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                                 )
 
     def check_price(self):
@@ -532,7 +538,7 @@ class AutoTrade:
                 print(f"version: {account['version']}, position: {self.flag} 매도 주문 실행")
                 for element in sell_query:
                     element.sell_order_time = datetime.now()
-                    element.sell_price = self.get_order_price(False, account['sell_rate_option'])
+                    element.sell_price = self.get_order_price(self.now_price, False, account['sell_rate_option'])
                     element.save()
 
 
