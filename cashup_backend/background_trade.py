@@ -79,18 +79,18 @@ class AutoTrade:
             before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "D" and now_up_down.up_down == "U":
                 range_query = MinuteData.objects.filter(datetime__range=[last_fdd.datetime + timedelta(minutes=5), data.last().datetime])
-                max_list = []
-                prev_up_down, prev_max_price = "", ""
+                min_list = []
+                prev_up_down, prev_min_price = "", ""
                 flag = True
                 for element in range_query:
                     if element.signal == "fU(U)":
                         flag = False
                     if prev_up_down == "D" and element.up_down == "U":
-                        max_list.append(prev_max_price)
+                        min_list.append(prev_min_price)
                     prev_up_down = element.up_down
-                    prev_max_price = element.max_price
+                    prev_min_price = element.min_price
                 if flag:
-                    if max(max_list) == before_up_down.max_price:
+                    if min(min_list) == before_up_down.min_price:
                         self.version_1_long_flag = True
                         self.version_1_long_datetime = last_fdd.datetime
                     else:
@@ -102,14 +102,14 @@ class AutoTrade:
             before_up_down = data.exclude(id=data.last().id).last()
             if before_up_down.up_down == "U" and now_up_down.up_down == "D":
                 range_query = MinuteData.objects.filter(datetime__range=[last_fuu.datetime + timedelta(minutes=5), data.last().datetime])
-                min_list = []
-                prev_up_down, prev_min_price = "", ""
+                max_list = []
+                prev_up_down, prev_max_price = "", ""
                 for element in range_query:
                     if prev_up_down == "U" and element.up_down == "D":
-                        max_list.append(prev_min_price)
+                        max_list.append(prev_max_price)
                     prev_up_down = element.up_down
                     prev_min_price = element.min_price
-                if min(min_list) == before_up_down.min_price:
+                if max(max_list) == before_up_down.max_price:
                     self.version_1_short_flag = True
                     self.version_1_short_datetime = last_fuu.datetime
                 else:
