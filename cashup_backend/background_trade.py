@@ -81,17 +81,21 @@ class AutoTrade:
                 range_query = MinuteData.objects.filter(datetime__range=[last_fuu.datetime + timedelta(minutes=5), data.last().datetime])
                 max_list = []
                 prev_up_down, prev_max_price = "", ""
+                flag = True
                 for element in range_query:
+                    if element.signal == "fD(D)":
+                        flag = False
                     if prev_up_down == "U" and element.up_down == "D":
                         max_list.append(prev_max_price)
                     prev_up_down = element.up_down
                     prev_min_price = element.min_price
-                if max(max_list) == before_up_down.max_price:
-                    self.version_1_long_flag = True
-                    self.version_1_long_datetime = last_fuu.datetime
-                elif min(max_list) == before_up_down.min_price:
-                    self.version_1_short_flag = True
-                    self.version_1_short_datetime = last_fuu.datetime
+                if flag and len(max_list) > 0:
+                    if max(max_list) == before_up_down.max_price:
+                        self.version_1_long_flag = True
+                        self.version_1_long_datetime = last_fuu.datetime
+                    elif min(max_list) == before_up_down.min_price:
+                        self.version_1_short_flag = True
+                        self.version_1_short_datetime = last_fuu.datetime
                     
         last_fdd = data.filter(signal="fD(D)").last()
         if data.last().datetime - last_fdd.datetime >= timedelta(minutes=30):
@@ -109,7 +113,7 @@ class AutoTrade:
                         min_list.append(prev_min_price)
                     prev_up_down = element.up_down
                     prev_min_price = element.min_price
-                if flag:
+                if flag and len(min_list) > 0:
                     if min(min_list) == before_up_down.min_price:
                         self.version_1_short_flag = True
                         self.version_1_short_datetime = last_fdd.datetime
