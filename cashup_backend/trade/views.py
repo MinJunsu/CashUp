@@ -16,10 +16,10 @@ class TradeResultAPIView(APIView):
             accounts = 3
         elif version == 3:
             accounts = 4
-        long_query = TradeResult.objects.filter(Q(position=True), Q(user=accounts), ~Q(buy_order_time=None), Q(sell_time=None))
-        long_finished_query = TradeResult.objects.filter(Q(position=True), Q(user=accounts), ~Q(sell_time=None))
-        short_query = TradeResult.objects.filter(Q(position=False), Q(user=accounts), ~Q(buy_order_time=None), Q(sell_time=None))
-        short_finished_query = TradeResult.objects.filter(Q(position=False), Q(user=accounts), ~Q(sell_time=None))
+        long_query = TradeResult.objects.filter(Q(position=True), Q(user=accounts), ~Q(buy_order_time=None), Q(sell_time=None)).order_by('-id')
+        long_finished_query = TradeResult.objects.filter(Q(position=True), Q(user=accounts), ~Q(sell_time=None)).order_by('-id')
+        short_query = TradeResult.objects.filter(Q(position=False), Q(user=accounts), ~Q(buy_order_time=None), Q(sell_time=None)).order_by('-id')
+        short_finished_query = TradeResult.objects.filter(Q(position=False), Q(user=accounts), ~Q(sell_time=None)).order_by('-id')
         long_trade = TradeResultModelSerializer(long_query, many=True)
         long_finished_trade = TradeResultModelSerializer(long_finished_query, many=True)
         short_trade = TradeResultModelSerializer(short_query, many=True)
