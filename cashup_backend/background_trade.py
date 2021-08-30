@@ -45,6 +45,7 @@ class AutoTrade:
         self.now_price = minute_data.last().close_price
         self.min_price = minute_data.last().min_price
         self.max_price = minute_data.last().max_price
+        print(minute_data.last().datetime)
         self.get_accounts()
         self.version_1_is_buy(minute_data)
         self.version_2_is_buy(minute_data)
@@ -543,10 +544,11 @@ class AutoTrade:
 
 
 if __name__ == "__main__":
-    trade_list = [AutoTrade(True), AutoTrade(False)]
+    trade_list = [ AutoTrade(True), AutoTrade(False) ]
     for trade in trade_list:
         trade.check_price()
         if datetime.now().minute % 5 == 0:
+            time.sleep(30)
             trade.buy_order()
             trade.sell_order()
 
