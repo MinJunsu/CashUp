@@ -436,27 +436,30 @@ class AutoTrade:
                             TradeResult.objects.bulk_create(order_list)
                 else:
                     if len(result_query) == 0:
-                        print(f"version: {account['version']}, position: {self.flag} 매수 주문 실행")
-                        if self.flag:
-                            TradeResult.objects.create(
-                                position=self.flag,
-                                user=account['user'],
-                                version=account['version'],
-                                buy_order_time=datetime.now(),
-                                amount=100,
-                                buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
-                            )
+                        if TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_order_time=None), Q(buy_time=None)).last():
+                            pass
                         else:
-                            TradeResult.objects.create(
-                                position=self.flag,
-                                user=account['user'],
-                                version=account['version'],
-                                buy_order_time=datetime.now(),
-                                amount=100,
-                                buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
-                            )
+                            print(f"version: {account['version']}, position: {self.flag} 매수 주문 실행")
+                            if self.flag:
+                                TradeResult.objects.create(
+                                    position=self.flag,
+                                    user=account['user'],
+                                    version=account['version'],
+                                    buy_order_time=datetime.now(),
+                                    amount=100,
+                                    buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
+                                )
+                            else:
+                                TradeResult.objects.create(
+                                    position=self.flag,
+                                    user=account['user'],
+                                    version=account['version'],
+                                    buy_order_time=datetime.now(),
+                                    amount=100,
+                                    buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
+                                )
                     elif len(result_query) > 0:
-                        if (result_query.last().buy_order_time is not None) or (datetime.now() - result_query.last().buy_time > timedelta(minutes=30)):
+                        if datetime.now() - result_query.last().buy_time >= timedelta(minutes=30):
                             prev_trade = result_query
                             prev_amount_sum = 0
                             for idx, element in enumerate(prev_trade):
