@@ -456,7 +456,7 @@ class AutoTrade:
                                 buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                             )
                     elif len(result_query) > 0:
-                        if not (result_query.last().buy_time is None or datetime.now() - result_query.last().buy_time < timedelta(minutes=30)):
+                        if (result_query.last().buy_time is not None) or (datetime.now() - result_query.last().buy_time > timedelta(minutes=30)):
                             prev_trade = result_query
                             prev_amount_sum = 0
                             for idx, element in enumerate(prev_trade):
@@ -466,7 +466,7 @@ class AutoTrade:
                             print(f"version: {account['version']}, position: {self.flag} 추가 매수 주문 실행")
 
                             if self.flag:
-                                if self.now_price * (1 - (account['buy_rate_option'] / 10000)) < prev_price:
+                                if self.get_order_price(self.now_price, True, account['buy_rate_option']) < prev_price:
                                     TradeResult.objects.create(
                                         position=self.flag,
                                         user=account['user'],
@@ -476,7 +476,7 @@ class AutoTrade:
                                         buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                                     )
                             else:
-                                if self.now_price * (1 + (account['buy_rate_option'] / 10000)) > prev_price:
+                                if self.get_order_price(self.now_price, True, account['buy_rate_option']) > prev_price:
                                     TradeResult.objects.create(
                                         position=self.flag,
                                         user=account['user'],
