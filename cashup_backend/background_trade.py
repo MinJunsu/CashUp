@@ -353,7 +353,7 @@ class AutoTrade:
 
     def buy_order(self):
         for account in self.test_trade_users:
-            result_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None), Q(sell_order_time=None))
+            result_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None), Q(sell_time=None))
             if account['version'] != 1:
                 if result_query:
                     continue
