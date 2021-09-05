@@ -353,10 +353,11 @@ class AutoTrade:
 
     def buy_order(self):
         for account in self.test_trade_users:
-            if account['version'] != 1:
-                if TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), Q(buy_time=None), ~Q(buy_order_time=None)):
-                    continue
             result_query = TradeResult.objects.filter(Q(position=self.flag), Q(user=account['user']), ~Q(buy_time=None), Q(sell_order_time=None))
+            if account['version'] != 1:
+                if result_query:
+                    continue
+            
             buy_flag = False
             if self.flag:
                 if account['version'] == 1:
@@ -455,6 +456,8 @@ class AutoTrade:
                                 buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                             )
                     elif len(result_query) > 0:
+                        if datetime.now() - result_query.last().datetime < timedelta(minutes=30):
+                            return
                         prev_trade = result_query
                         prev_amount_sum = 0
                         for idx, element in enumerate(prev_trade):
@@ -503,7 +506,7 @@ class AutoTrade:
                             element.save()
 
                         elif datetime.now() - element.buy_order_time > timedelta(hours=1):
-                            if account['version'] != 4:
+                            if account['version'] != 1:
                                 print(f"version: {account['version']}, position: {self.flag} 매수 주문 취소 실행")
                                 element.delete()
                 else:
@@ -514,7 +517,7 @@ class AutoTrade:
                             element.save()
 
                         elif datetime.now() - element.buy_order_time > timedelta(hours=1):
-                            if account['version'] != 4:
+                            if account['version'] != 1:
                                 print(f"version: {account['version']}, position: {self.flag} 매수 주문 취소 실행")
                                 element.delete()
 
@@ -522,19 +525,24 @@ class AutoTrade:
                                                           Q(sell_time=None))
             if sell_check_query:
                 if self.flag:
-                    if sell_check_query.last().sell_price < self.max_price:
-                        print(f"version: {account['version']}, position: {self.flag} 매도 실행")
-                        for element in sell_check_query:
+                    for element in sell_check_query:
+                        if element.sell_price < self.max_price:
                             element.sell_time = datetime.now()
                             element.calculate_earning_rate(now_price=element.sell_price)
                             element.save()
+                        elif datetime.now() - element.buy_order_time > timedelta(hours=1):
+                            element.sell_order_time = None
+                            element.sell_price = 0.0
                 else:
-                    if sell_check_query.last().sell_price > self.min_price:
-                        print(f"version: {account['version']}, position: {self.flag} 매도 실행")
-                        for element in sell_check_query:
+                    for element in sell_check_query:
+                        if sell_check_query.last().sell_price > self.min_price:
                             element.sell_time = datetime.now()
                             element.calculate_earning_rate(now_price=element.sell_price)
                             element.save()
+                        elif datetime.now() - element.buy_order_time > timedelta(hours=1):
+                            element.sell_order_time = None
+                            element.sell_price = 0.0
+
 
     def sell_order(self):
         for account in self.test_trade_users:

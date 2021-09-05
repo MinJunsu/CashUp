@@ -4,6 +4,51 @@ import Loader from "react-loader-spinner";
 
 import { ISateFlow } from "Types/DBTypes";
 
+interface IProps {
+    title: string,
+    flow: ISateFlow
+}
+
+function Flow({ title, flow }: IProps) {
+    console.log(flow);
+    return(
+        <Container>
+            <Header>{title} 흐름 데이터</Header>
+            {
+                flow.loading ? <LoaderCotainer><Loader type="TailSpin" color="#a9eef5" height={100} width={100}/></LoaderCotainer>:
+                <Frame>
+                    <Section>
+                        <SectionHeader>
+                            <SectionHeaderElement basis={4}>시간</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>가격</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>흐름</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>확인</SectionHeaderElement>
+                            <SectionHeaderElement basis={1}>거래</SectionHeaderElement>
+                        </SectionHeader>
+                        <SectionBody>
+                        {
+                            flow.data.map((element) => {
+                                return(
+                                    <SectionBodyContainer key={element.datetime.replace("T", " ").substring(0, 16)} id={element.datetime.replace("T", " ").substring(0, 16)}>
+                                        <SectionBodyElement basis={4}>{element.datetime.replace("T", " ").substring(0, 16)}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.base_price}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.flow}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.flow_confirm}</SectionBodyElement>
+                                        <SectionBodyElement basis={1}>{element.flow_trade}</SectionBodyElement>
+                                    </SectionBodyContainer>
+                                );
+                            })
+                        }
+                        </SectionBody>
+                    </Section>
+                </Frame>
+            }
+        </Container>
+    );
+}
+
+export default Flow;
+
 const Container = styled.div`
     text-align: center;
     flex: 1;
@@ -65,48 +110,3 @@ const SectionBodyElement = styled.span<{ basis: number }>`
     padding-right: 1px;
     
 `;
-
-interface IProps {
-    title: string,
-    flow: ISateFlow
-}
-
-function Flow({ title, flow }: IProps) {
-    console.log(flow);
-    return(
-        <Container>
-            <Header>{title} 흐름 데이터</Header>
-            {
-                flow.loading ? <LoaderCotainer><Loader type="TailSpin" color="#a9eef5" height={100} width={100}/></LoaderCotainer>:
-                <Frame>
-                    <Section>
-                        <SectionHeader>
-                            <SectionHeaderElement basis={4}>시간</SectionHeaderElement>
-                            <SectionHeaderElement basis={1}>가격</SectionHeaderElement>
-                            <SectionHeaderElement basis={1}>흐름</SectionHeaderElement>
-                            <SectionHeaderElement basis={1}>확인</SectionHeaderElement>
-                            <SectionHeaderElement basis={1}>거래</SectionHeaderElement>
-                        </SectionHeader>
-                        <SectionBody>
-                        {
-                            flow.data.map((element) => {
-                                return(
-                                    <SectionBodyContainer key={element.datetime.replace("T", " ").substring(0, 16)} id={element.datetime.replace("T", " ").substring(0, 16)}>
-                                        <SectionBodyElement basis={4}>{element.datetime.replace("T", " ").substring(0, 16)}</SectionBodyElement>
-                                        <SectionBodyElement basis={1}>{element.base_price}</SectionBodyElement>
-                                        <SectionBodyElement basis={1}>{element.flow}</SectionBodyElement>
-                                        <SectionBodyElement basis={1}>{element.flow_confirm}</SectionBodyElement>
-                                        <SectionBodyElement basis={1}>{element.flow_trade}</SectionBodyElement>
-                                    </SectionBodyContainer>
-                                );
-                            })
-                        }
-                        </SectionBody>
-                    </Section>
-                </Frame>
-            }
-        </Container>
-    );
-}
-
-export default Flow;
