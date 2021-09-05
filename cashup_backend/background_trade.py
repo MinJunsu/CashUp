@@ -456,7 +456,7 @@ class AutoTrade:
                                 buy_price=self.get_order_price(self.now_price, True, account['buy_rate_option'])
                             )
                     elif len(result_query) > 0:
-                        if datetime.now() - result_query.last().datetime < timedelta(minutes=30):
+                        if result_query.last().buy_time is None or datetime.now() - result_query.last().buy_time < timedelta(minutes=30):
                             return
                         prev_trade = result_query
                         prev_amount_sum = 0
