@@ -2,6 +2,12 @@ from django.db import models
 
 
 # Create your models here.
+class RealTimeData(models.Model):
+    market = models.CharField(max_length=10)
+    updated_time = models.DateTimeField(auto_now=True)
+    xbt_usd = models.FloatField(verbose_name='XBTUSD')
+    xbt_u21 = models.FloatField(verbose_name='XBTU21')
+
 class HourData(models.Model):
     datetime = models.DateTimeField(verbose_name='시간')
     open_price = models.FloatField(verbose_name='시가')
