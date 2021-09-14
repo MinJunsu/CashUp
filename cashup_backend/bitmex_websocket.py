@@ -36,6 +36,8 @@ def on_message(ws, message):
                 prev_xbt_usd = data['price']
             else:
                 prev_xbt_u21 = data['price']
+        if datetime.now() - prev_save_time > timedelta(hours=1):
+            quit()
 
 def save_data():
     query = RealTimeData.objects.filter(market="bitmex").last()
