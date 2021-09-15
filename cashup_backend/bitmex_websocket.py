@@ -34,11 +34,11 @@ def on_message(ws, message):
             prev_save_time = datetime.now()
         else:
             if data['symbol'] == "XBTUSD":
-                prev_xbt_usd = data['price']
+                prev_xbt_usd = data['bidPrice']
             else:
-                prev_xbt_u21 = data['price']
+                prev_xbt_u21 = data['bidPrice']
         if datetime.now() - prev_save_time > timedelta(hours=1):
-            sys.exit(1)
+            ws.close()
 
 def save_data():
     query = RealTimeData.objects.filter(market="bitmex").last()
@@ -53,8 +53,8 @@ def on_close(ws, close_status_code, close_msg):
     print("### closed ###")
 
 def on_open(ws):
-    ws.send('{"op": "subscribe", "args": ["orderBookL2_25:XBTUSD"]}')
-    ws.send('{"op": "subscribe", "args": ["orderBookL2_25:XBTU21"]}')
+    ws.send('{"op": "subscribe", "args": ["quote:XBTUSD"]}')
+    ws.send('{"op": "subscribe", "args": ["quote:XBTU21"]}')
 
 if __name__ == "__main__":
     websocket.enableTrace(False)
