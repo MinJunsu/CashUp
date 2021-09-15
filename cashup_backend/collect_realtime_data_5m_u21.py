@@ -436,7 +436,7 @@ for num_count in range(len(req)):
                 }
                 # DownFlow.objects.update_or_create(datetime=flow_element.datetime, defaults=default)
 
-    if num_count > 0:
+    if num_count > 990:
         default = {
             'datetime': datetime,
             'open_price': open_price,
