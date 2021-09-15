@@ -3,6 +3,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'cashup_backend.settings'
 os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = "true"
 
 import django
+import sys
 django.setup()
 
 from data.models import RealTimeData
@@ -37,7 +38,7 @@ def on_message(ws, message):
             else:
                 prev_xbt_u21 = data['price']
         if datetime.now() - prev_save_time > timedelta(hours=1):
-            quit()
+            sys.exit(1)
 
 def save_data():
     query = RealTimeData.objects.filter(market="bitmex").last()
