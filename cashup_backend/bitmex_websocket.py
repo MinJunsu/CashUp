@@ -22,12 +22,12 @@ prev_xbt_u21 = 0
 def on_message(ws, message):
     global prev_save_time, initial_time, prev_xbt_usd, prev_xbt_u21
     message = json.loads(message)
-
+    print(message)
     table = message.get("table")
     action = message.get("action")
     data = message.get("data")[0]
     if action == "insert":
-        print(data)
+        # print(data)
         if prev_save_time == None:
             prev_save_time = datetime.now()
             initial_time = datetime.now()
@@ -57,7 +57,7 @@ def on_close(ws, close_status_code, close_msg):
 
 def on_open(ws):
     ws.send('{"op": "subscribe", "args": ["trade:XBTUSD"]}')
-    ws.send('{"op": "subscribe", "args": ["trade:XBTU21"]}')
+    ws.send('{"op": "subscribe", "args": ["trade:XBTH22"]}')
 
 if __name__ == "__main__":
     websocket.enableTrace(False)
