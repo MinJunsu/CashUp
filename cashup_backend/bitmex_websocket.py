@@ -14,20 +14,23 @@ import time
 import json
 from datetime import datetime, timedelta
 
+
+query = RealTimeData.objects.filter(market="bitmex").last()
+
 prev_save_time = None
 initial_time = None
-prev_xbt_usd = 0
-prev_xbt_u21 = 0
-prev_usd_bid = 0
-prev_usd_ask = 0
-prev_sub_bid = 0
-prev_sub_ask = 0
+prev_xbt_usd = query.xbt_usd
+prev_xbt_u21 = query.xbt_sub
+prev_usd_bid = query.bid_usd
+prev_usd_ask = query.ask_usd
+prev_sub_bid = query.bid_sub
+prev_sub_ask = query.ask_sub
 
 
 def on_message(ws, message):
     global prev_save_time, initial_time, prev_xbt_usd, prev_xbt_u21, prev_usd_bid, prev_usd_ask, prev_sub_bid, prev_sub_ask
     message = json.loads(message)
-    print(message)
+    # print(message)
     table = message.get("table")
     action = message.get("action")
     data = message.get("data")[0]
@@ -57,14 +60,13 @@ def on_message(ws, message):
 
 def save_data():
     query = RealTimeData.objects.filter(market="bitmex").last()
-    if prev_xbt_u21 != 0 and prev_xbt_usd != 0 and prev_usd_bid != 0 and prev_sub_bid != 0:
-        query.xbt_usd = prev_xbt_usd
-        query.xbt_u21 = prev_xbt_u21
-        query.bid_usd = prev_usd_bid
-        query.ask_usd = prev_usd_ask
-        query.bid_sub = prev_sub_bid
-        query.ask_sub = prev_sub_ask
-        query.save()
+    query.xbt_usd = prev_xbt_usd
+    query.xbt_sub = prev_xbt_u21
+    query.bid_usd = prev_usd_bid
+    query.ask_usd = prev_usd_ask
+    query.bid_sub = prev_sub_bid
+    query.ask_sub = prev_sub_ask
+    query.save()
 
 def on_error(ws, error):
     print(error)
@@ -77,6 +79,7 @@ def on_open(ws):
     ws.send('{"op": "subscribe", "args": ["trade:XBTH22"]}')
     ws.send('{"op": "subscribe", "args": ["orderBook10:XBTUSD"]}')
     ws.send('{"op": "subscribe", "args": ["orderBook10:XBTH22"]}')
+    
 
 if __name__ == "__main__":
     websocket.enableTrace(False)
