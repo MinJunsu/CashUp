@@ -38,7 +38,8 @@ def on_message(ws, message):
             prev_xbt_u21 = data['price']
 
         if datetime.now() - prev_save_time > timedelta(seconds=1):
-            save_data()
+            if prev_xbt_usd != 0 and prev_xbt_u21 != 0:
+                save_data()
             prev_save_time = datetime.now()
         if datetime.now() - initial_time > timedelta(hours=1):
             ws.close()
