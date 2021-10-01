@@ -5,7 +5,7 @@ from .models import RealTimeData, HourData, MinuteData, U21HourData, U21MinuteDa
 # Register your models here.
 @admin.register(RealTimeData)
 class RealTimeDataAdmin(admin.ModelAdmin):
-    list_display = ['market', 'updated_time', 'xbt_usd', 'xbt_u21']
+    list_display = ['market', 'updated_time', 'xbt_usd', 'xbt_sub', 'bid_usd', 'ask_usd', 'bid_sub', 'ask_sub']
 
 @admin.register(HourData)
 class HourDataAdmin(admin.ModelAdmin):

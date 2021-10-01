@@ -18,9 +18,14 @@ prev_save_time = None
 initial_time = None
 prev_xbt_usd = 0
 prev_xbt_u21 = 0
+prev_usd_bid = 0
+prev_usd_ask = 0
+prev_sub_bid = 0
+prev_sub_ask = 0
+
 
 def on_message(ws, message):
-    global prev_save_time, initial_time, prev_xbt_usd, prev_xbt_u21
+    global prev_save_time, initial_time, prev_xbt_usd, prev_xbt_u21, prev_usd_bid, prev_usd_ask, prev_sub_bid, prev_sub_ask
     message = json.loads(message)
     print(message)
     table = message.get("table")
@@ -38,17 +43,28 @@ def on_message(ws, message):
             prev_xbt_u21 = data['price']
 
         if datetime.now() - prev_save_time > timedelta(seconds=1):
-            if prev_xbt_usd != 0 and prev_xbt_u21 != 0:
-                save_data()
+            save_data()
             prev_save_time = datetime.now()
         if datetime.now() - initial_time > timedelta(hours=1):
             ws.close()
+    else:
+        if data['symbol'] == "XBTUSD":
+            prev_usd_bid = data['bids'][0][0]
+            prev_usd_ask = data['asks'][0][0]
+        elif data['symbol'] == "XBTH22":
+            prev_sub_bid = data['bids'][0][0]
+            prev_sub_ask = data['asks'][0][0]
 
 def save_data():
     query = RealTimeData.objects.filter(market="bitmex").last()
-    query.xbt_usd = prev_xbt_usd
-    query.xbt_u21 = prev_xbt_u21
-    query.save()
+    if prev_xbt_u21 != 0 and prev_xbt_usd != 0 and prev_usd_bid != 0 and prev_sub_bid != 0:
+        query.xbt_usd = prev_xbt_usd
+        query.xbt_u21 = prev_xbt_u21
+        query.bid_usd = prev_usd_bid
+        query.ask_usd = prev_usd_ask
+        query.bid_sub = prev_sub_bid
+        query.ask_sub = prev_sub_ask
+        query.save()
 
 def on_error(ws, error):
     print(error)
@@ -59,13 +75,15 @@ def on_close(ws, close_status_code, close_msg):
 def on_open(ws):
     ws.send('{"op": "subscribe", "args": ["trade:XBTUSD"]}')
     ws.send('{"op": "subscribe", "args": ["trade:XBTH22"]}')
+    ws.send('{"op": "subscribe", "args": ["orderBook10:XBTUSD"]}')
+    ws.send('{"op": "subscribe", "args": ["orderBook10:XBTH22"]}')
 
 if __name__ == "__main__":
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://www.bitmex.com/realtime",
-                              on_open=on_open,
-                              on_message=on_message,
-                              on_error=on_error,
-                              on_close=on_close)
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close)
 
 ws.run_forever()

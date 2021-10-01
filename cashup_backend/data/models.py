@@ -6,7 +6,11 @@ class RealTimeData(models.Model):
     market = models.CharField(max_length=10)
     updated_time = models.DateTimeField(auto_now=True)
     xbt_usd = models.FloatField(verbose_name='XBTUSD')
-    xbt_u21 = models.FloatField(verbose_name='XBTU21')
+    xbt_sub = models.FloatField(verbose_name='XBTSUB')
+    bid_usd = models.FloatField(verbose_name='BIDUSD')
+    ask_usd = models.FloatField(verbose_name='ASKUSD')
+    bid_sub = models.FloatField(verbose_name='BIDSUB')
+    ask_sub = models.FloatField(verbose_name='ASKSUB')
 
 class HourData(models.Model):
     datetime = models.DateTimeField(verbose_name='시간')
