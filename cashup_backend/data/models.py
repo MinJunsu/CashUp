@@ -34,7 +34,7 @@ class HourData(models.Model):
     def __str__(self):
         return str(self.datetime)
 
-class U21HourData(models.Model):
+class HourSubData(models.Model):
     datetime = models.DateTimeField(verbose_name='시간')
     open_price = models.FloatField(verbose_name='시가')
     min_price = models.FloatField(verbose_name='저가')
@@ -56,7 +56,7 @@ class U21HourData(models.Model):
     def __str__(self):
         return str(self.datetime)
 
-class U21MinuteData(models.Model):
+class MinuteSubData(models.Model):
     datetime = models.DateTimeField(verbose_name='시간')
     open_price = models.FloatField(verbose_name='시가')
     min_price = models.FloatField(verbose_name='저가')

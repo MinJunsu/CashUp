@@ -7,7 +7,7 @@ django.setup()
 
 import requests
 from datetime import timedelta, datetime
-from data.models import U21HourData
+from data.models import HourSubData
 
 up_dn_list = []
 last_data = []
@@ -342,6 +342,6 @@ for num_count in range(len(req)):
             'work_one_1_0': now_work_1_0_2,
             'work_one_1_5': now_work_1_5_2   
         }
-        U21HourData.objects.update_or_create(datetime=datetime, defaults=default)
+        HourSubData.objects.update_or_create(datetime=datetime, defaults=default)
 
     prev_up_down = UD
