@@ -43,7 +43,7 @@ hour_up_down = ""
 prev_signal_up_price = 0
 prev_signal_down_price = 0
 
-URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBTU21&binSize=1h&partial=true&count=1000&reverse=true"
+URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBTZ21&binSize=1h&partial=true&count=1000&reverse=true"
 req = requests.get(URL).json()
 req.reverse()
 for num_count in range(len(req)):

@@ -61,7 +61,7 @@ down_flow_confirm_list = []
 up_flow_element_list = []
 up_flow_confirm_list = []
 
-URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBTU21&binSize=5m&partial=true&count=1000&reverse=true"
+URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBTZ21&binSize=5m&partial=true&count=1000&reverse=true"
 req = requests.get(URL).json()
 req.reverse()
 for num_count in range(len(req)):
