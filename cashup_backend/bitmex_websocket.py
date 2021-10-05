@@ -49,7 +49,7 @@ def on_message(ws, message):
         if datetime.now() - prev_save_time > timedelta(seconds=1):
             save_data()
             prev_save_time = datetime.now()
-        if datetime.now() - initial_time > timedelta(hours=1):
+        if datetime.now() - initial_time > timedelta(minutes=5):
             ws.close()
     else:
         if data['symbol'] == "XBTUSD":
