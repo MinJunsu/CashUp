@@ -9,8 +9,6 @@ django.setup()
 from data.models import RealTimeData
 
 import websocket
-import _thread
-import time
 import json
 from datetime import datetime, timedelta
 
@@ -25,7 +23,6 @@ prev_usd_bid = query.bid_usd
 prev_usd_ask = query.ask_usd
 prev_sub_bid = query.bid_sub
 prev_sub_ask = query.ask_sub
-
 
 def on_message(ws, message):
     global prev_save_time, initial_time, prev_xbt_usd, prev_xbt_sub, prev_usd_bid, prev_usd_ask, prev_sub_bid, prev_sub_ask
@@ -91,4 +88,4 @@ if __name__ == "__main__":
         on_error=on_error,
         on_close=on_close)
 
-ws.run_forever()
+    ws.run_forever()

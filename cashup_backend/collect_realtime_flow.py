@@ -1,4 +1,3 @@
-import os
 import django
 from datetime import timedelta, datetime
 
