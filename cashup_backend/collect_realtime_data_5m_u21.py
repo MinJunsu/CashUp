@@ -12,7 +12,7 @@ from data.models import MinuteSubData
 
 URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBTZ21&binSize=5m&partial=true&count=1000&reverse=true"
 request = requests.get(URL).json()
-for idx, data in enumerate(request):
+for idx, data in enumerate(reversed(request)):
     datetime = datetime.strptime(data['timestamp'].replace("T", " ")[0:19], "%Y-%m-%d %H:%M:%S") + timedelta(
         hours=9) - timedelta(minutes=5)
     open_price = data['open'] if data['open'] is not None else 0
