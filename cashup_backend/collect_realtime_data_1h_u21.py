@@ -20,9 +20,9 @@ for idx, data in enumerate(request):
     low_price = data['low'] if data['low'] is not None else 0
     close_price = data['close'] if data['close'] is not None else 0
     volume = data['volume'] if data['volume'] is not None else 0
-
+    HourSubData
     if idx > 990:
-        HourSubData.objects.update_or_create(datetime=datetime, default={
+        HourSubData.objects.update_or_create(datetime=datetime, defaults={
             'time': f"{datetime.day} {datetime.hour}:{datetime.minute}",
             'open_price': open_price,
             'min_price': low_price,

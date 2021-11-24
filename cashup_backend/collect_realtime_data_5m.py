@@ -14,7 +14,7 @@ URL = "https://www.bitmex.com/api/v1/trade/bucketed?symbol=XBT&binSize=5m&partia
 request = requests.get(URL).json()
 for idx, data in enumerate(request):
     datetime = datetime.strptime(data['timestamp'].replace("T", " ")[0:19], "%Y-%m-%d %H:%M:%S") + timedelta(
-        hours=8)
+        hours=9) - timedelta(minutes=5)
     open_price = data['open'] if data['open'] is not None else 0
     high_price = data['high'] if data['high'] is not None else 0
     low_price = data['low'] if data['low'] is not None else 0
@@ -22,7 +22,7 @@ for idx, data in enumerate(request):
     volume = data['volume'] if data['volume'] is not None else 0
 
     if idx > 990:
-        MinuteData.objects.update_or_create(datetime=datetime, default={
+        MinuteData.objects.update_or_create(datetime=datetime, defaults={
             'time': f"{datetime.day} {datetime.hour}:{datetime.minute}",
             'open_price': open_price,
             'min_price': low_price,

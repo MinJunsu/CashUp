@@ -22,7 +22,7 @@ for idx, data in enumerate(request):
     volume = data['volume'] if data['volume'] is not None else 0
 
     if idx > 990:
-        HourData.objects.update_or_create(datetime=datetime, default={
+        HourData.objects.update_or_create(datetime=datetime, defaults={
             'time': f"{datetime.day} {datetime.hour}:{datetime.minute}",
             'open_price': open_price,
             'min_price': low_price,
