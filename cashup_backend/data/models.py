@@ -39,12 +39,14 @@ class HourSubData(Data):
 
 
 class MinuteSubData(Data):
+    real = models.CharField(max_length=4, default='')
 
     def __str__(self):
         return str(self.datetime)
 
 
 class MinuteData(Data):
+    real = models.CharField(max_length=4, default='')
 
     def __str__(self):
         return str(self.datetime)
