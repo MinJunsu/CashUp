@@ -23,7 +23,7 @@ for idx, data in enumerate(reversed(request)):
     print(datetime)
     if idx > 990:
         HourData.objects.update_or_create(datetime=datetime, defaults={
-            'time': f"{datetime.day} {datetime.hour}:{datetime.minute}",
+            'time': f"{str(datetime.day).zfill(2)} {str(datetime.hour).zfill(2)}:{str(datetime.minute).zfill(2)}",
             'open_price': open_price,
             'min_price': low_price,
             'max_price': high_price,
